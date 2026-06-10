@@ -220,6 +220,25 @@
   </div>
 
   <div id="output"><div class="empty">Fill the brief and click <b>Generate</b>. Your copy-ready prompts will appear here.</div></div>
+
+  <fieldset style="margin-top:28px">
+    <legend>Format pasted output for Word</legend>
+    <div class="hint" style="margin:0 0 10px">ChatGPT collapses the line breaks around the &lt;h2&gt;/&lt;h3&gt; tags when you copy, so headings get jammed into the body. Paste the full ChatGPT output below and click <b>Clean for Word</b> — it puts every heading, CTA, image tag, and bold-label line on its own paragraph. Copy the cleaned result into your Word doc.</div>
+    <textarea id="cleanInput" style="min-height:120px" placeholder="Paste the full ChatGPT output here…"></textarea>
+    <div class="actions" style="margin:12px 0 0">
+      <button class="primary" onclick="runClean()">Clean for Word</button>
+      <span class="pill" id="cleanStatus"></span>
+    </div>
+    <div id="cleanWrap" style="display:none;margin-top:14px">
+      <div class="card">
+        <div class="card-head">
+          <div class="t">Cleaned output</div>
+          <button class="copy" id="cleanCopy">Copy cleaned text</button>
+        </div>
+        <pre id="cleanOutput"></pre>
+      </div>
+    </div>
+  </fieldset>
 </div>
 
 <script>
@@ -1407,6 +1426,42 @@ function clearAll(){
   document.getElementById("output").innerHTML='<div class="empty">Fill the brief and click <b>Generate</b>.</div>';
   setStatus("Cleared.", false);
 }
+
+/* ---------- Format pasted output for Word: re-separate blocks ChatGPT collapsed ---------- */
+function cleanForWord(t){
+  if(!t) return "";
+  t = t.replace(/\r\n/g,"\n").replace(/\r/g,"\n");
+  // put each block-level tag on its own line, surrounded by blank lines
+  t = t.replace(/[ \t]*<(h1|h2|h3)>[ \t]*/g, "\n\n<$1>");
+  t = t.replace(/[ \t]*<\/(h1|h2|h3)>[ \t]*/g, "</$1>\n\n");
+  t = t.replace(/[ \t]*<CTA Button>[ \t]*/g, "\n\n<CTA Button> ");
+  t = t.replace(/[ \t]*<\/CTA Button>[ \t]*/g, " </CTA Button>\n\n");
+  t = t.replace(/[ \t]*<Image Alt>[ \t]*/g, "\n\n<Image Alt>");
+  t = t.replace(/[ \t]*<\/Image Alt>[ \t]*/g, "</Image Alt>\n\n");
+  // infographic image placeholder on its own line
+  t = t.replace(/[ \t]*(\[\s*INFOGRAPHIC[^\]]*\])[ \t]*/g, "\n\n$1\n\n");
+  // each bold-label list item (**Label:** ...) starts a new paragraph; inline bold (no trailing colon) is left alone
+  t = t.replace(/[ \t]*(\*\*[^*\n]{1,80}:\*\*)/g, "\n\n$1");
+  // tidy: collapse 3+ blank lines, strip trailing spaces, trim
+  t = t.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  return t;
+}
+function runClean(){
+  const raw = document.getElementById("cleanInput").value;
+  const s = document.getElementById("cleanStatus");
+  if(!raw.trim()){ s.textContent="Paste the ChatGPT output first."; s.style.color="var(--warn)"; return; }
+  const out = cleanForWord(raw);
+  document.getElementById("cleanOutput").textContent = out;
+  document.getElementById("cleanWrap").style.display = "block";
+  s.textContent="Cleaned. Copy it into your Word doc."; s.style.color="var(--accent2)";
+}
+document.getElementById("cleanCopy").addEventListener("click",()=>{
+  const btn=document.getElementById("cleanCopy");
+  navigator.clipboard.writeText(document.getElementById("cleanOutput").textContent).then(()=>{
+    btn.textContent="Copied ✓"; btn.classList.add("done");
+    setTimeout(()=>{btn.textContent="Copy cleaned text"; btn.classList.remove("done");},1500);
+  });
+});
 
 populateIndustries();
 updateBtn();
