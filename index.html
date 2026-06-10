@@ -139,10 +139,32 @@ SUB-SERVICES: <one per line, or 'scrape URL' or 'none'>"></textarea>
       <legend>Context</legend>
       <label>H1s already used for this client</label>
       <textarea id="H1S_USED" placeholder="Paste H1s used on other city pages so they aren't repeated, or N/A"></textarea>
-      <label>SGE/AIO topic direction</label>
-      <textarea id="SGE_DIRECTION" placeholder="A specific audience pain-point angle to anchor SGE/AIO, or N/A"></textarea>
     </fieldset>
   </div>
+
+  <fieldset>
+    <legend>Topic Control — prevent repeats across this client's pages</legend>
+    <div class="row2">
+      <div>
+        <label>SGE/AIO angle</label>
+        <select id="SGE_TOPIC"></select>
+        <div class="hint">The "What [Audience] in [City] Face When…" lens. Pick a different one per page.</div>
+      </div>
+      <div>
+        <label>Infographic topic</label>
+        <select id="INFOGRAPHIC_TOPIC"></select>
+        <div class="hint">Forces the infographic subject so it doesn't overlap the page or repeat across cities.</div>
+      </div>
+    </div>
+    <div class="row2">
+      <div><label>SGE/AIO angle — custom override <span class="hint">(used instead of the dropdown if filled)</span></label><input id="SGE_CUSTOM" placeholder="Type a specific angle, or leave blank"></div>
+      <div><label>Infographic topic — custom override <span class="hint">(used instead of the dropdown if filled)</span></label><input id="INFOGRAPHIC_CUSTOM" placeholder="Type a specific topic, or leave blank"></div>
+    </div>
+    <div class="row2">
+      <div><label>SGE/AIO angles already used <span class="hint">(one per line — never reuse)</span></label><textarea id="SGE_USED" placeholder="Paste SGE/AIO angles already used on this client's other city pages"></textarea></div>
+      <div><label>Infographic topics already used <span class="hint">(one per line — never reuse)</span></label><textarea id="INFOGRAPHIC_USED" placeholder="Paste infographic topics already used on this client's other city pages"></textarea></div>
+    </div>
+  </fieldset>
 
   <fieldset class="meta-after">
     <legend>Selected Meta Set — fill AFTER running Prompt 1</legend>
@@ -385,7 +407,7 @@ SECTION RULES:
 - Each bullet must cover a COMPLETELY DISTINCT dimension (e.g. cost, timing/urgency, provider selection, family dynamics, safety/health, legal/regulatory, local availability). No two bullets may overlap, and no bullet may restate anything in the H3 paragraph.
 - Do NOT mention milestones, awards, or certifications anywhere in this section.
 - City name appears EXACTLY 3 times — in the H2 and H3 paragraph ONLY (not in the bullets).
-- If SGE/AIO TOPIC DIRECTION is provided in the brief, use it as the lens for the H2, H3 paragraph, and all 5 bullets.
+- TOPIC CONTROL: Use SGE/AIO TOPIC DIRECTION as the lens for the H2, H3 paragraph, and all 5 bullets. If it is "Auto", choose a fresh angle yourself. Either way, the angle and the 5 bullet dimensions must NOT match anything in "SGE/AIO ANGLES ALREADY USED".
 
 OUTPUT FORMAT (exactly this, nothing else):
 [SGE_AIO]
@@ -459,7 +481,7 @@ OUTPUT FORMAT (exactly this, nothing else):
 TASK: Write ONLY the [INFOGRAPHIC_PROMPT] block — a ready-to-paste prompt the team will give to ChatGPT or Gemini to design an infographic for this city page.
 
 SECTION RULES:
-- The infographic TOPIC must be COMPLETELY DIFFERENT from the page's written content (a complementary educational angle, not a restatement of the services/SGE content).
+- TOPIC CONTROL: If INFOGRAPHIC TOPIC is provided in the brief (not "Auto"), the infographic MUST be about exactly that topic. If it is "Auto", choose one yourself. Either way the topic must be COMPLETELY DIFFERENT from the page's written content (a complementary educational angle, not a restatement of the services/SGE content) and must NOT appear in "INFOGRAPHIC TOPICS ALREADY USED".
 - Design: 4–5 items MAX. Each item = one icon + one bold subtopic label ONLY. No descriptive text or body copy under any item.
 - Labels must be large and prominent, with generous whitespace between items.
 - Footer: the target keyword ONLY. Do NOT include the website URL (infographics are images; URLs aren't clickable).
@@ -669,7 +691,8 @@ H2: "What [Audience] in [City] Face When [Service Situation]".
 H3: a STATEMENT phrase (never a question).
 A paragraph of EXACTLY 3 sentences (~50–75 words) about local conditions specific to this city; business name appears exactly once here.
 
-Then EXACTLY 5 bullets, each: "• **Bold Label:** one fully optimized, self-contained sentence." Each bullet a COMPLETELY DISTINCT dimension; no overlap with the paragraph or each other; no business name in bullets. Use SGE/AIO TOPIC DIRECTION as the lens if provided.
+Then EXACTLY 5 bullets, each: "• **Bold Label:** one fully optimized, self-contained sentence." Each bullet a COMPLETELY DISTINCT dimension; no overlap with the paragraph or each other; no business name in bullets.
+TOPIC CONTROL: Use SGE/AIO TOPIC DIRECTION as the lens for the H2, the H3 paragraph, and all 5 bullets. If it is "Auto", choose a fresh angle yourself. Either way, the angle and the 5 bullet dimensions must NOT match anything in "SGE/AIO ANGLES ALREADY USED" — pick genuinely different ground.
 [/SGE_AIO]
 
 [SERVICES]
@@ -718,7 +741,9 @@ URGENCY angle (use the Vertical Pack CTA_3 wording). DEATH CARE EXCEPTION: repla
 [/CTA_3]
 
 [INFOGRAPHIC_PROMPT]
-A ready-to-paste ChatGPT/Gemini prompt to design an infographic. TOPIC completely different from this page's content (a complementary educational angle). 4–5 items MAX, each = one icon + one bold subtopic label only (no body copy). Labels large with generous whitespace. Footer = the target keyword ONLY (no website URL). Include this exact line: "I have attached a screenshot of the client's website homepage. Use it as your reference for the exact color palette, fonts, and overall visual style."
+A ready-to-paste ChatGPT/Gemini prompt to design an infographic.
+TOPIC CONTROL: If INFOGRAPHIC TOPIC is provided (not "Auto"), the infographic MUST be about exactly that topic. If it is "Auto", choose a complementary educational topic yourself. Either way the topic must be COMPLETELY DIFFERENT from this page's written content AND must NOT appear in "INFOGRAPHIC TOPICS ALREADY USED".
+4–5 items MAX, each = one icon + one bold subtopic label only (no body copy). Labels large with generous whitespace. Footer = the target keyword ONLY (no website URL). Include this exact line: "I have attached a screenshot of the client's website homepage. Use it as your reference for the exact color palette, fonts, and overall visual style."
 [/INFOGRAPHIC_PROMPT]
 
 Before returning, silently self-check and fix any violations: city-name count equals 25 by the distribution above; business name appears once in only the 5 allowed sections; phone only in CTA_1 and CTA_3; no em-dashes; no dollar amounts; no year references; SGE/AIO has exactly 5 bullets and a 3-sentence H3 paragraph. Output ONLY the tagged sections, nothing else.`};
@@ -727,10 +752,120 @@ Before returning, silently self-check and fix any violations: city-name count eq
 const FIELDS = ["BUSINESS_NAME","WEBSITE_URL","PHONE","URL_SLUG","KEYWORD","CITY","STATE",
   "HAS_PHYSICAL_LOCATION","ADDRESS","INDUSTRY","VERTICAL","WRITING_VOICE",
   "BRAND_IDENTITY","GBP_REVIEW","CLIENT_RESTRICTIONS","LOCATION_RESTRICTIONS","KEYWORD_RESEARCH",
-  "SERVICES","FAQ_LINKS","H1S_USED","SGE_DIRECTION",
+  "SERVICES","FAQ_LINKS","H1S_USED",
+  "SGE_TOPIC","SGE_CUSTOM","SGE_USED","INFOGRAPHIC_TOPIC","INFOGRAPHIC_CUSTOM","INFOGRAPHIC_USED",
   "SELECTED_H1","SELECTED_META_TITLE","SELECTED_META_DESCRIPTION"];
 
 const VLABEL = {HOME_IMPROVEMENT:"Home Improvement",HOME_CARE:"Home Care",DEATH_CARE:"Death Care"};
+
+/* ---------- Topic libraries (per vertical) for the anti-repeat dropdowns ---------- */
+const AUTO = "Auto — let AI choose a fresh angle (avoid the Already-Used list)";
+const SGE_TOPICS = {
+  HOME_IMPROVEMENT:[
+    "Choosing a contractor they can actually trust",
+    "Deciding whether to repair or fully replace",
+    "Planning the project around budget and financing",
+    "Navigating permits, codes, and inspections",
+    "Timing the project around weather and seasons",
+    "Lowering energy bills and improving efficiency",
+    "Protecting the home against storm or weather damage",
+    "Avoiding low-quality materials and fly-by-night installers"
+  ],
+  HOME_CARE:[
+    "Recognizing when a loved one needs help at home",
+    "Deciding between in-home care and a facility",
+    "Arranging care after a hospital stay or health event",
+    "Understanding how to pay for care (insurance, Medicare/Medicaid, private)",
+    "Finding and trusting the right caregiver",
+    "Easing caregiver burnout within the family",
+    "Keeping an aging parent safe and independent at home",
+    "Coordinating consistent, reliable scheduling"
+  ],
+  DEATH_CARE:[
+    "Making arrangements during an unexpected loss",
+    "Understanding burial versus cremation options",
+    "Pre-planning to ease the burden on family",
+    "Handling costs and what is involved, sensitively",
+    "Honoring a loved one's final wishes",
+    "Knowing the first steps to take after a death",
+    "Choosing a meaningful way to memorialize a life",
+    "Supporting children and family through grief"
+  ]
+};
+const INFOGRAPHIC_TOPICS = {
+  HOME_IMPROVEMENT:[
+    "5 Signs It's Time to Replace Your Windows and Doors",
+    "Window Frame Materials: A Homeowner's Comparison Guide",
+    "How to Choose the Right Glass Type for Every Room",
+    "A Homeowner's Guide to Window Performance Ratings",
+    "Home Heat Loss by Area: Where Your Energy Goes",
+    "Understanding ENERGY STAR Ratings for Windows and Doors",
+    "How Energy-Efficient Windows Reduce Your Utility Bills",
+    "The True Cost of Keeping Old Windows",
+    "5 Signs You Need a New Roof",
+    "Roofing Material Comparison: A Homeowner's Guide",
+    "How to Spot Storm Damage on Your Roof",
+    "What to Expect During a Roof Replacement",
+    "A Seasonal HVAC Maintenance Checklist",
+    "Signs Your HVAC System Is Ready for Replacement",
+    "How to Improve Indoor Air Quality at Home",
+    "Choosing the Right Window Treatments for Each Room"
+  ],
+  HOME_CARE:[
+    "Signs Your Senior Parent May Need Home Care",
+    "The Home Safety Checklist for Aging in Place",
+    "Activities of Daily Living: A Family Reference Guide",
+    "How to Talk to a Parent About Accepting Home Care",
+    "Questions to Ask a Home Care Provider",
+    "Medicare Home Health Benefits: What Seniors Are Entitled To",
+    "Home Health vs. Home Care: Understanding the Difference",
+    "How to Qualify for Medicare Home Health Services",
+    "The Recovery-at-Home Checklist for Families",
+    "Signs a Loved One May Need Help at Home"
+  ],
+  DEATH_CARE:[
+    "The Funeral Pre-Planning Checklist",
+    "What to Do in the First 24 Hours After a Loss",
+    "Burial vs. Cremation: Understanding Your Options",
+    "How to Write a Meaningful Obituary",
+    "Questions to Ask When Choosing a Funeral Home",
+    "Funeral, Memorial Service, and Celebration of Life: The Difference",
+    "How to Support a Grieving Family: A Practical Guide",
+    "A Guide to Military Funeral Honors and Benefits",
+    "How to Plan a Celebration of Life Service",
+    "How to Talk to Your Family About End-of-Life Wishes",
+    "Types of Cremation Urns and Memorialization Options",
+    "Types of Cremation Services Explained",
+    "Pre-Planning Your Cremation: A Step-by-Step Guide",
+    "Types of Cemetery Burial Options Explained",
+    "What to Know Before Purchasing a Cemetery Plot",
+    "Steps in Planning a Meaningful Service"
+  ]
+};
+
+function fillSelect(id, items){
+  const sel = document.getElementById(id);
+  const prev = sel.value;
+  sel.innerHTML = "";
+  [AUTO, ...items].forEach(t=>{
+    const o = document.createElement("option");
+    o.value = t; o.textContent = t; sel.appendChild(o);
+  });
+  // keep the previous choice if it still exists, else default to Auto
+  sel.value = [...sel.options].some(o=>o.value===prev) ? prev : AUTO;
+}
+function populateTopics(){
+  const v = val("VERTICAL");
+  fillSelect("SGE_TOPIC", SGE_TOPICS[v]);
+  fillSelect("INFOGRAPHIC_TOPIC", INFOGRAPHIC_TOPICS[v]);
+}
+// resolve a topic field: custom override wins; else the dropdown; "Auto" -> "Auto"
+function resolveTopic(selId, customId){
+  const custom = val(customId);
+  if(custom) return custom;
+  const sel = val(selId);
+  return (sel === AUTO || !sel) ? "Auto" : sel;
+}
 
 function val(id){ return (document.getElementById(id).value || "").trim(); }
 function orNA(v){ return v ? v : "N/A"; }
@@ -776,7 +911,16 @@ ${v("FAQ_LINKS")}
 ${v("H1S_USED")}
 
 === SGE/AIO TOPIC DIRECTION ===
-${v("SGE_DIRECTION")}
+${resolveTopic("SGE_TOPIC","SGE_CUSTOM")}
+
+=== SGE/AIO ANGLES ALREADY USED (NEVER REPEAT) ===
+${v("SGE_USED")}
+
+=== INFOGRAPHIC TOPIC ===
+${resolveTopic("INFOGRAPHIC_TOPIC","INFOGRAPHIC_CUSTOM")}
+
+=== INFOGRAPHIC TOPICS ALREADY USED (NEVER REPEAT) ===
+${v("INFOGRAPHIC_USED")}
 
 === SELECTED META SET ===
 SELECTED_H1: ${v("SELECTED_H1")}
@@ -854,6 +998,7 @@ document.getElementById("togglePack").addEventListener("click",e=>{
 document.getElementById("VERTICAL").addEventListener("change",()=>{
   const box=document.getElementById("packPreview");
   if(box.style.display==="block") box.textContent = PACKS[val("VERTICAL")];
+  populateTopics();
 });
 
 /* ---------- Save / load brief (localStorage) ---------- */
@@ -866,7 +1011,16 @@ function loadBrief(){
   const raw=localStorage.getItem("rrm_city_brief");
   if(!raw){ setStatus("No saved brief found.", true); return; }
   const data=JSON.parse(raw);
-  FIELDS.forEach(id=>{ if(data[id]!==undefined) document.getElementById(id).value=data[id]; });
+  // set VERTICAL first, repopulate the topic dropdowns for that vertical, then apply all values
+  if(data.VERTICAL!==undefined) document.getElementById("VERTICAL").value=data.VERTICAL;
+  populateTopics();
+  FIELDS.forEach(id=>{
+    if(data[id]===undefined) return;
+    const el=document.getElementById(id);
+    // only keep a saved topic-dropdown value if it still exists for this vertical
+    if((id==="SGE_TOPIC"||id==="INFOGRAPHIC_TOPIC") && ![...el.options].some(o=>o.value===data[id])) return;
+    el.value=data[id];
+  });
   setStatus("Brief loaded.", false);
 }
 function clearAll(){
@@ -874,11 +1028,13 @@ function clearAll(){
     const el=document.getElementById(id);
     if(el.tagName==="SELECT") el.selectedIndex=0; else el.value="";
   });
+  populateTopics();
   document.getElementById("output").innerHTML='<div class="empty">Fill the brief and click <b>Generate</b>.</div>';
   setStatus("Cleared.", false);
 }
 
 updateBtn();
+populateTopics();
 </script>
 </body>
 </html>
