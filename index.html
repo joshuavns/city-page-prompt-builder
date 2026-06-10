@@ -437,13 +437,13 @@ GLOBAL RULES: No em-dashes; no dollar amounts; no year references; active voice;
 
 SECTION RULES:
 - H2 pattern: "What [Audience] in [City] Face When [Service Situation]".
-- One H3 that is a STATEMENT phrase, never a question.
-- Under the H3: a paragraph of EXACTLY 3 sentences (~50–75 words) about local conditions specific to this city. The business name appears EXACTLY ONCE, naturally, in one of these 3 sentences.
+- One H3 that is a STATEMENT phrase (never a question) and anchors a real LOCAL SIGNAL of the city — a well-known/high-population neighborhood or district, a landmark, a major road, terrain, or a climate pattern.
+- Under the H3: the LOCAL SIGNALS paragraph — EXACTLY 3 sentences (~50–75 words) grounded in real, recognizable details of the city. Name specific neighborhoods or districts (favor well-known or higher-population areas), landmarks, major roads, terrain, or climate patterns that genuinely resonate with residents and tie to the service. Use ONLY accurate, verifiable local details — NEVER invent a neighborhood, landmark, road, or condition; if unsure, use the city's downtown or established districts or verifiable climate/terrain rather than guessing. The business name appears EXACTLY ONCE, naturally, in these 3 sentences. (Death Care: keep the local reference gentle and general — community and area, not a real-estate-style neighborhood list.)
 - Then EXACTLY 5 bold-label items, one per line (no bullet glyph): "**Bold Label:** one fully optimized, self-contained sentence."
 - Each bullet must cover a COMPLETELY DISTINCT dimension (e.g. cost, timing/urgency, provider selection, family dynamics, safety/health, legal/regulatory, local availability). No two bullets may overlap, and no bullet may restate anything in the H3 paragraph.
 - Do NOT mention milestones, awards, or certifications anywhere in this section.
 - City name appears EXACTLY 3 times — in the H2 and H3 paragraph ONLY (not in the bullets).
-- TOPIC CONTROL: Use SGE/AIO TOPIC DIRECTION as the lens for the H2, H3 paragraph, and all 5 bullets. If it is "Auto", choose a fresh angle yourself. Either way, the angle and the 5 bullet dimensions must NOT match anything in "SGE/AIO ANGLES ALREADY USED".
+- TOPIC CONTROL: Use SGE/AIO TOPIC DIRECTION as the lens for the H2 and the 5 bullets — the H3 paragraph stays focused on local signals. If it is "Auto", choose a fresh angle yourself. Either way, the angle and the 5 bullet dimensions must NOT match anything in "SGE/AIO ANGLES ALREADY USED".
 
 OUTPUT FORMAT (exactly this, nothing else):
 <h2><heading></h2>
@@ -705,15 +705,15 @@ Download all images:
 <CTA Button> <ACTION-angle CTA (Vertical Pack CTA_1 wording), max 10 words before the phone, city once, ends with the PHONE number, no business name> </CTA Button>
 
 <h2>What [Audience] in [City] Face When [Service Situation]</h2>
-<h3><a STATEMENT phrase, never a question></h3>
-<A paragraph of EXACTLY 3 sentences (~50–75 words) about local conditions specific to this city; business name appears exactly once here.>
+<h3><a STATEMENT phrase (never a question) that anchors a real LOCAL SIGNAL of [City] — e.g. a well-known/high-population neighborhood or district, a landmark, a major road, terrain, or a climate pattern></h3>
+<This is the LOCAL SIGNALS paragraph: EXACTLY 3 sentences (~50–75 words) grounded in real, recognizable details of [City]. Name specific neighborhoods or districts (favor well-known or higher-population areas), landmarks, major roads, terrain, or climate patterns that genuinely resonate with residents and tie to the service. Use ONLY accurate, verifiable local details — NEVER invent a neighborhood, landmark, road, or condition; if unsure, use the city's downtown or established districts or verifiable climate/terrain rather than guessing. The business name appears exactly once here. (Death Care: keep the local reference gentle and general — community and area, not a real-estate-style neighborhood list.)>
 
 **<Label>:** <one fully optimized, self-contained sentence>
 **<Label>:** <one fully optimized, self-contained sentence>
 **<Label>:** <one fully optimized, self-contained sentence>
 **<Label>:** <one fully optimized, self-contained sentence>
 **<Label>:** <one fully optimized, self-contained sentence>
-(EXACTLY 5 bold-label items, each a COMPLETELY DISTINCT dimension, no overlap with the paragraph or each other, no business name. TOPIC CONTROL: use SGE/AIO TOPIC DIRECTION as the lens for the <h2>, the paragraph, and all 5 items; if it is "Auto", choose a fresh angle; either way the angle and the 5 dimensions must NOT match anything in "SGE/AIO ANGLES ALREADY USED".)
+(EXACTLY 5 bold-label items, each a COMPLETELY DISTINCT dimension, no overlap with the local-signals paragraph or each other, no business name. TOPIC CONTROL: use SGE/AIO TOPIC DIRECTION as the lens for the <h2> and the 5 items — the <h3> paragraph stays focused on local signals. If it is "Auto", choose a fresh angle; either way the angle and the 5 dimensions must NOT match anything in "SGE/AIO ANGLES ALREADY USED".)
 
 <h2>[Service Type] Services in [City], [State]</h2>
 <Intro blurb: 2–3 sentences, 30–50 words, mention city + a keyword variation, soft transition into the list, NO business name.>
@@ -782,7 +782,7 @@ Footer text: <the target keyword>
 
 <Image Alt>[Describe the infographic clearly and naturally]</Image Alt>
 
-Before returning, silently self-check and fix any violations: city-name count equals 25 by the distribution above; business name appears once in only the 5 allowed sections (in Why Choose Us only in the <h2>); phone only in the CTA_1 and CTA_3 buttons; no em-dashes; no dollar amounts; no year references; SGE/AIO has exactly 5 bold-label items and a 3-sentence paragraph; every service heading is wrapped in <h3>; if ADDRESS was provided, the COMPLETE address (including state and ZIP) appears in both the Intro and the Closing. Output ONLY the page content in the format above, nothing else.`};
+Before returning, silently self-check and fix any violations: city-name count equals 25 by the distribution above; business name appears once in only the 5 allowed sections (in Why Choose Us only in the <h2>); phone only in the CTA_1 and CTA_3 buttons; no em-dashes; no dollar amounts; no year references; SGE/AIO has exactly 5 bold-label items and a 3-sentence local-signals paragraph that names real, verifiable [City] neighborhoods/landmarks/roads/climate (none invented); every service heading is wrapped in <h3>; if ADDRESS was provided, the COMPLETE address (including state and ZIP) appears in both the Intro and the Closing. Output ONLY the page content in the format above, nothing else.`};
 
 /* ---------- Fields used to build the brief ---------- */
 const FIELDS = ["BUSINESS_NAME","WEBSITE_URL","PHONE","URL_SLUG","KEYWORD","CITY","STATE",
