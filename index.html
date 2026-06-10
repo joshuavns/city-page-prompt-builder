@@ -63,6 +63,7 @@
   .svc-toggle:hover{color:var(--accent)}
   .svc-subwrap{margin-top:8px}
   .svc-subs{min-height:64px}
+  .svc-note{margin-top:8px;font-size:12px;color:var(--warn);background:#2a2113;border:1px solid #4a3a16;border-radius:6px;padding:8px 10px}
   .addsvc{background:transparent;color:var(--accent);border:1px dashed var(--line);width:100%;padding:11px;font-weight:600}
   .addsvc:hover{border-color:var(--accent);background:var(--panel2)}
 </style>
@@ -1154,7 +1155,8 @@ function addService(data){
     '<span class="svc-toggle" onclick="toggleSubs(this)">▸ Add sub-services manually (optional)</span>' +
     '<div class="svc-subwrap" style="display:none">' +
       '<textarea class="svc-subs" placeholder="One sub-service per line. Leave blank to let the URL or a standard description handle it."></textarea>' +
-    '</div>';
+    '</div>' +
+    '<div class="svc-note" style="display:none">⚠ ChatGPT can&#39;t open this link. Add sub-services manually (or paste the page text into Brand Identity) so the section is accurate — then verify it against the live page.</div>';
   document.getElementById("servicesList").appendChild(card);
   card.querySelector(".svc-name").value = data.name || "";
   card.querySelector(".svc-url").value = data.url || "";
@@ -1163,6 +1165,15 @@ function addService(data){
     card.querySelector(".svc-subwrap").style.display = "block";
     card.querySelector(".svc-toggle").textContent = "▾ Add sub-services manually (optional)";
   }
+  const upd = ()=>updateSvcNote(card);
+  card.querySelector(".svc-url").addEventListener("input", upd);
+  card.querySelector(".svc-subs").addEventListener("input", upd);
+  upd();
+}
+function updateSvcNote(card){
+  const url = card.querySelector(".svc-url").value.trim();
+  const subs = card.querySelector(".svc-subs").value.trim();
+  card.querySelector(".svc-note").style.display = (url && !subs) ? "block" : "none";
 }
 function toggleSubs(el){
   const card = el.closest(".svc");
