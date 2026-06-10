@@ -467,6 +467,7 @@ GLOBAL SECTION RULES:
 - NO business name anywhere in this section.
 - NO milestones, awards, or certifications in this section.
 - City name appears EXACTLY 6 times total across this section (H2 + blurb + service descriptions).
+- Every service/sub-service heading MUST be on its own line beginning with the literal "H3: " prefix (e.g. "H3: Air Conditioning"). Never output a bare heading line without the "H3: " prefix.
 
 OUTPUT FORMAT (exactly this, nothing else):
 [SERVICES]
@@ -525,7 +526,7 @@ GLOBAL RULES: No em-dashes; no dollar amounts; no year references; active voice;
 
 SECTION RULES:
 - H2 pattern: "Why Choose [Business Name] in [City]".
-- Short intro blurb: 2–3 sentences, 30–50 words. The business name appears EXACTLY ONCE here.
+- Short intro blurb: 2–3 sentences, 30–50 words. Do NOT include the business name in the blurb — it already appears in the H2 (which is the section's one and only business-name placement). Use "our team" or "we" instead.
 - Then an H3 using the "Why Choose Us H3" pattern from your Vertical Pack (e.g. "Our Promise to [City] Families" for care/death care, or "Why [City] Homeowners Choose Us" for home improvement).
 - Then bullets using the • character, 25–40 words each. Each bullet = a CLIENT-SPECIFIC differentiator tied to evidence, process, or proof drawn from BRAND IDENTITY (certifications, brand authorizations, process commitments, years of specialization, credentials). No generic claims.
 - Milestones, awards, and certifications ARE allowed in this section.
@@ -534,7 +535,7 @@ SECTION RULES:
 OUTPUT FORMAT (exactly this, nothing else):
 [WHY_CHOOSE_US]
 H2: Why Choose <Business Name> in <City>
-<intro blurb, business name once>
+<intro blurb — NO business name; use "our team"/"we">
 
 H3: <use the Why Choose Us H3 pattern from your Vertical Pack>
 
@@ -676,7 +677,7 @@ GLOBAL RULES (apply to every section):
 - The phone number appears ONLY in CTA_1 and CTA_3 — never in CTA_2, never in any body text.
 
 WHOLE-PAGE COHERENCE (you can see every section at once — enforce these across the full draft):
-- BUSINESS NAME appears EXACTLY ONCE in each of: Meta Description, Intro (paragraph 2), SGE/AIO (the H3 paragraph only), Why Choose Us (intro blurb), and Closing — and NOWHERE ELSE. It must NOT appear in Services, any CTA, or any FAQ answer. (GBP Review verbatim text is exempt.)
+- BUSINESS NAME appears EXACTLY ONCE in each of: Meta Description, Intro (paragraph 2), SGE/AIO (the H3 paragraph only), Why Choose Us (in the H2 heading ONLY — see below), and Closing — and NOWHERE ELSE. It must NOT appear in Services, any CTA, or any FAQ answer, and in Why Choose Us it must NOT appear again in the blurb or bullets. (GBP Review verbatim text is exempt.)
 - CITY NAME total = EXACTLY 25 across body sections, distributed exactly: Intro 3, SGE/AIO 3 (H2 + H3 paragraph only, none in the bullets), Services 6, Why Choose Us 4, GBP Review 2 (H2 + the attribution line), FAQ 3 (H3 question headings only — ZERO in answer bodies), Closing 4. The CTAs, the Meta block, image ALT/FILENAME, and the infographic prompt are EXCLUDED from this count (each CTA still mentions the city once, but those do not count toward the 25).
 - NO topic overlap: the SGE/AIO bullets, the Services descriptions, and the Infographic topic must each cover DISTINCT ground. The Infographic topic must be a complementary educational angle found NOWHERE else on the page.
 - Milestones, awards, and certifications may appear ONLY in Intro paragraph 2, Why Choose Us, and Closing.
@@ -723,6 +724,7 @@ TOPIC CONTROL: Use SGE/AIO TOPIC DIRECTION as the lens for the H2, the H3 paragr
 H2: "[Service Type] Services in [City], [State]".
 Intro blurb: 2–3 sentences, 30–50 words, mention city + a keyword variation, soft transition into the list, NO business name.
 Cover exactly the services in SERVICES TO COVER, in order — do not invent any. For a service WITH sub-services (manual list or scraped URL of 5 or fewer): one H3 per sub-service, EXACTLY 2 sentences each (what it is + benefit; then a specific application/upgrade/local use/installation detail). If a scraped page lists more than 5 sub-services: group by logical category, one H3 per category, 2–3 sentences. For 5+ total services or a service with no sub-services: a standard 60–90 word description (when it is needed / local factors / practical outcome). For EVERY service with a URL: embed a mid-paragraph keyword-variation [anchor](url) — never generic, never the exact service name, never with trailing city. No business name, no milestones in this section.
+FORMAT: every service/sub-service heading MUST be on its own line beginning with the literal "H3: " prefix (e.g. "H3: Air Conditioning"). Never output a bare heading line without the "H3: " prefix.
 [/SERVICES]
 
 [CTA_2]
@@ -730,8 +732,8 @@ VALUE angle (use the Vertical Pack CTA_2 wording). Max 10 words, city once, NO p
 [/CTA_2]
 
 [WHY_CHOOSE_US]
-H2: "Why Choose [Business Name] in [City]".
-Intro blurb: 2–3 sentences, 30–50 words, business name exactly once.
+H2: "Why Choose [Business Name] in [City]". (This H2 is the ONE place the business name appears in this section.)
+Intro blurb: 2–3 sentences, 30–50 words. Do NOT repeat the business name here — it is already in the H2; refer to the business as "our team" or "we" instead.
 H3: use the Vertical Pack "Why Choose Us H3" pattern.
 Then "• **Label:**" bullets, 25–40 words each, every bullet a CLIENT-SPECIFIC differentiator drawn from BRAND IDENTITY (certifications, brand authorizations, process commitments, years of specialization, credentials). No generic claims. Milestones/awards/certs allowed here.
 [/WHY_CHOOSE_US]
