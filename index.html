@@ -1168,7 +1168,7 @@ function addService(data){
     '<div class="svc-subwrap" style="display:none">' +
       '<textarea class="svc-subs" placeholder="One sub-service per line. Leave blank to let the URL or a standard description handle it."></textarea>' +
     '</div>' +
-    '<div class="svc-note" style="display:none">⚠ ChatGPT can&#39;t open this link. Add sub-services manually (or paste the page text into Brand Identity) so the section is accurate — then verify it against the live page.</div>';
+    '<div class="svc-note" style="display:none">⚠ Heads up: ChatGPT can&#39;t reliably open every website. It reads some pages fine but gets blocked on others (bot blocks, logins, scripts), so when you use a URL here, double-check the sub-services it generates against the live page, or add them manually to be safe.</div>';
   document.getElementById("servicesList").appendChild(card);
   card.querySelector(".svc-name").value = data.name || "";
   card.querySelector(".svc-url").value = data.url || "";
