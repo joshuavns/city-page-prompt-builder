@@ -66,6 +66,10 @@
   .svc-note{margin-top:8px;font-size:12px;color:var(--warn);background:#2a2113;border:1px solid #4a3a16;border-radius:6px;padding:8px 10px}
   .addsvc{background:transparent;color:var(--accent);border:1px dashed var(--line);width:100%;padding:11px;font-weight:600}
   .addsvc:hover{border-color:var(--accent);background:var(--panel2)}
+  .docpreview{background:#ffffff;color:#111;padding:18px 20px;max-height:420px;overflow:auto;border-radius:0 0 10px 10px}
+  .docpreview p{margin:0 0 12px;line-height:1.5;font-family:Calibri,Arial,sans-serif;font-size:14px}
+  .docpreview a{color:#1155cc;text-decoration:underline}
+  .docpreview strong{font-weight:700}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -232,10 +236,10 @@
     <div id="cleanWrap" style="display:none;margin-top:14px">
       <div class="card">
         <div class="card-head">
-          <div class="t">Cleaned output</div>
-          <button class="copy" id="cleanCopy">Copy cleaned text</button>
+          <div class="t">Cleaned output <span>— select all + copy, or use the button (keeps links &amp; bold)</span></div>
+          <button class="copy" id="cleanCopy">Copy for Word</button>
         </div>
-        <pre id="cleanOutput"></pre>
+        <div id="cleanOutput" class="docpreview"></div>
       </div>
     </div>
   </fieldset>
@@ -1446,21 +1450,49 @@ function cleanForWord(t){
   t = t.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
   return t;
 }
+// turn the cleaned plain text into rich HTML: literal tags stay visible, [anchor](url) -> real link, **bold** -> bold
+function esc2(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function renderForWord(cleaned){
+  return cleaned.split(/\n{2,}/).map(block=>{
+    let h = esc2(block);
+    // markdown link -> real hyperlink (escape the visible anchor, keep the href)
+    h = h.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, (m,txt,url)=>`<a href="${url.replace(/"/g,'%22')}">${txt}</a>`);
+    // bold
+    h = h.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    // keep any single line breaks inside a block (e.g. infographic items)
+    h = h.replace(/\n/g, "<br>");
+    return "<p>" + h + "</p>";
+  }).join("");
+}
 function runClean(){
   const raw = document.getElementById("cleanInput").value;
   const s = document.getElementById("cleanStatus");
   if(!raw.trim()){ s.textContent="Paste the ChatGPT output first."; s.style.color="var(--warn)"; return; }
-  const out = cleanForWord(raw);
-  document.getElementById("cleanOutput").textContent = out;
+  const cleaned = cleanForWord(raw);
+  document.getElementById("cleanOutput").innerHTML = renderForWord(cleaned);
   document.getElementById("cleanWrap").style.display = "block";
-  s.textContent="Cleaned. Copy it into your Word doc."; s.style.color="var(--accent2)";
+  s.textContent="Cleaned. Copy it into your Word doc (links and headings preserved)."; s.style.color="var(--accent2)";
 }
-document.getElementById("cleanCopy").addEventListener("click",()=>{
+document.getElementById("cleanCopy").addEventListener("click", async ()=>{
   const btn=document.getElementById("cleanCopy");
-  navigator.clipboard.writeText(document.getElementById("cleanOutput").textContent).then(()=>{
-    btn.textContent="Copied ✓"; btn.classList.add("done");
-    setTimeout(()=>{btn.textContent="Copy cleaned text"; btn.classList.remove("done");},1500);
-  });
+  const el=document.getElementById("cleanOutput");
+  const html=el.innerHTML;
+  const plain=el.innerText;
+  const done=()=>{ btn.textContent="Copied ✓"; btn.classList.add("done"); setTimeout(()=>{btn.textContent="Copy for Word"; btn.classList.remove("done");},1500); };
+  try{
+    // rich copy so Word keeps hyperlinks, bold, and paragraph breaks
+    await navigator.clipboard.write([new ClipboardItem({
+      "text/html": new Blob([html], {type:"text/html"}),
+      "text/plain": new Blob([plain], {type:"text/plain"})
+    })]);
+    done();
+  }catch(e){
+    // fallback: select the rendered preview so the user can Ctrl+C (still rich)
+    const r=document.createRange(); r.selectNodeContents(el);
+    const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    try{ document.execCommand("copy"); sel.removeAllRanges(); done(); }
+    catch(_){ document.getElementById("cleanStatus").textContent="Select the preview and press Ctrl+C."; }
+  }
 });
 
 populateIndustries();
