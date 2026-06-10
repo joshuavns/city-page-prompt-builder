@@ -58,7 +58,7 @@
 
 <div class="wrap">
   <div class="note">
-    <strong>Flow:</strong> Run <b>Prompt 1 (Meta)</b> first → pick a set → paste it into the <b>Selected Meta Set</b> fields below → click Generate again so Prompts 2–14 carry your chosen H1/title/description. Then run Prompts 2–14 in order. Assemble &amp; QA per Sections 15–16 of the SOP.
+    <strong>Flow:</strong> Run the <b>Meta</b> prompt first → pick a set → paste it into the <b>Selected Meta Set</b> fields below → click Generate again. In <b>One-shot</b> mode you then copy the single <b>Full Page</b> prompt and get the whole draft in one ChatGPT generation. Assemble &amp; QA per Sections 15–16 of the SOP.
   </div>
 
   <fieldset>
@@ -153,15 +153,27 @@ SUB-SERVICES: <one per line, or 'scrape URL' or 'none'>"></textarea>
     </div>
   </fieldset>
 
+  <fieldset>
+    <legend>Mode</legend>
+    <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-weight:500;color:var(--txt);margin:4px 0">
+      <input type="radio" name="mode" value="oneshot" checked style="width:auto" onchange="updateBtn()">
+      <span><b>One-shot</b> (recommended) — 2 prompts: Meta, then one <b>Full Page</b> prompt that outputs the entire draft in a single ChatGPT generation. Whole-page-aware, like the live tool.</span>
+    </label>
+    <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-weight:500;color:var(--txt);margin:4px 0">
+      <input type="radio" name="mode" value="sections" style="width:auto" onchange="updateBtn()">
+      <span><b>Section-by-section</b> — 14 separate prompts, one per section. Last resort / surgical regeneration of a single section.</span>
+    </label>
+  </fieldset>
+
   <div class="actions">
-    <button class="primary" onclick="generate()">Generate all 14 prompts</button>
+    <button class="primary" id="genBtn" onclick="generate()">Generate prompts</button>
     <button class="ghost" onclick="saveBrief()">Save brief to browser</button>
     <button class="ghost" onclick="loadBrief()">Load saved brief</button>
     <button class="ghost" onclick="clearAll()">Clear</button>
     <span class="pill" id="status"></span>
   </div>
 
-  <div id="output"><div class="empty">Fill the brief and click <b>Generate</b>. Your 14 copy-ready prompts will appear here.</div></div>
+  <div id="output"><div class="empty">Fill the brief and click <b>Generate</b>. Your copy-ready prompts will appear here.</div></div>
 </div>
 
 <script>
@@ -603,6 +615,114 @@ OUTPUT FORMAT (exactly this, nothing else):
 [/CTA_3]`}
 ];
 
+/* ---------- One-shot master prompt (reproduces the deployed tool's step 2: whole body in a single generation) ---------- */
+const FULLPAGE = {n:"FULL",title:"Full Page — one-shot",note:"run AFTER Prompt 1; produces the entire draft in one go",body:
+`You are an expert SEO content writer for Ring Ring Marketing specializing in local city pages. Write a COMPLETE city page draft in ONE response — every section below, in the exact order and tag format shown, with no preamble or commentary. Use the SELECTED_H1 / SELECTED_META_TITLE / SELECTED_META_DESCRIPTION already chosen in the Client Brief. The Vertical Pack at the bottom OVERRIDES any default heading wording, audience noun, CTA angle, or example here.
+
+GLOBAL RULES (apply to every section):
+- No em-dashes (—) anywhere; use a comma or a hyphen (-).
+- No exact dollar amounts — use evergreen phrasing.
+- No current/recent-year references in body content (historical founding years are fine).
+- Active voice. No buzzwords: embark, uncover, unveil, transform, revolutionize.
+- Follow WRITING_VOICE throughout. EXCEPTIONS: SGE/AIO is always neutral third-person; GBP Review reproduces the review verbatim and is exempt. Match INDUSTRY tone.
+- Formatting markers: **bold**, _italic_ / _"quoted text"_, [anchor text](url).
+- The exact KEYWORD string appears in the Meta Title ONLY. Everywhere else use close natural variations.
+- The phone number appears ONLY in CTA_1 and CTA_3 — never in CTA_2, never in any body text.
+
+WHOLE-PAGE COHERENCE (you can see every section at once — enforce these across the full draft):
+- BUSINESS NAME appears EXACTLY ONCE in each of: Meta Description, Intro (paragraph 2), SGE/AIO (the H3 paragraph only), Why Choose Us (intro blurb), and Closing — and NOWHERE ELSE. It must NOT appear in Services, any CTA, or any FAQ answer. (GBP Review verbatim text is exempt.)
+- CITY NAME total = EXACTLY 25 across body sections, distributed exactly: Intro 3, SGE/AIO 3 (H2 + H3 paragraph only, none in the bullets), Services 6, Why Choose Us 4, GBP Review 2 (H2 + the attribution line), FAQ 3 (H3 question headings only — ZERO in answer bodies), Closing 4. The CTAs, the Meta block, image ALT/FILENAME, and the infographic prompt are EXCLUDED from this count (each CTA still mentions the city once, but those do not count toward the 25).
+- NO topic overlap: the SGE/AIO bullets, the Services descriptions, and the Infographic topic must each cover DISTINCT ground. The Infographic topic must be a complementary educational angle found NOWHERE else on the page.
+- Milestones, awards, and certifications may appear ONLY in Intro paragraph 2, Why Choose Us, and Closing.
+
+Write the sections in EXACTLY this order and format:
+
+[META]
+URL: <WEBSITE_URL with the URL_SLUG appended, trailing slash>
+BUSINESS_NAME: <BUSINESS_NAME>
+CITY: <CITY>
+STATE: <STATE>
+META_TITLE: <SELECTED_META_TITLE>
+META_DESCRIPTION: <SELECTED_META_DESCRIPTION>
+H1: <SELECTED_H1>
+[/META]
+
+[INTRO]
+Two paragraphs, 80–120 words total. P1: target audience + local qualifier + the problem/situation; bold a close natural keyword variation ONCE (never the exact keyword). P2: EEAT credentials FIRST — open with the strongest trust signals from BRAND IDENTITY (every credential present must appear); business name once; if ADDRESS is not N/A weave it in as a natural location reference; end with a soft CTA setup.
+[/INTRO]
+
+[IMAGE_1]
+ALT: <descriptive, natural alt text — no keyword stuffing>
+FILENAME: <lowercase-hyphenated-descriptive>.jpg
+DOWNLOAD: [Client-provided / stock source / AI-generated]
+ORIGIN: [Client-provided / Pexels / Unsplash / Pixabay / StockSnap / AI-generated / Internally created]
+LICENSE: Checked official license page; approved for website use.
+AI_STATUS: [AI-generated / Not AI-generated]
+[/IMAGE_1]
+
+[CTA_1]
+ACTION angle (use the Vertical Pack CTA_1 wording). Max 10 words before the phone, city once, ends with the PHONE number, no business name.
+[/CTA_1]
+
+[SGE_AIO]
+H2: "What [Audience] in [City] Face When [Service Situation]".
+H3: a STATEMENT phrase (never a question).
+A paragraph of EXACTLY 3 sentences (~50–75 words) about local conditions specific to this city; business name appears exactly once here.
+
+Then EXACTLY 5 bullets, each: "• **Bold Label:** one fully optimized, self-contained sentence." Each bullet a COMPLETELY DISTINCT dimension; no overlap with the paragraph or each other; no business name in bullets. Use SGE/AIO TOPIC DIRECTION as the lens if provided.
+[/SGE_AIO]
+
+[SERVICES]
+H2: "[Service Type] Services in [City], [State]".
+Intro blurb: 2–3 sentences, 30–50 words, mention city + a keyword variation, soft transition into the list, NO business name.
+Cover exactly the services in SERVICES TO COVER, in order — do not invent any. For a service WITH sub-services (manual list or scraped URL of 5 or fewer): one H3 per sub-service, EXACTLY 2 sentences each (what it is + benefit; then a specific application/upgrade/local use/installation detail). If a scraped page lists more than 5 sub-services: group by logical category, one H3 per category, 2–3 sentences. For 5+ total services or a service with no sub-services: a standard 60–90 word description (when it is needed / local factors / practical outcome). For EVERY service with a URL: embed a mid-paragraph keyword-variation [anchor](url) — never generic, never the exact service name, never with trailing city. No business name, no milestones in this section.
+[/SERVICES]
+
+[CTA_2]
+VALUE angle (use the Vertical Pack CTA_2 wording). Max 10 words, city once, NO phone number (zero phone digits), no business name, no "call now" instruction.
+[/CTA_2]
+
+[WHY_CHOOSE_US]
+H2: "Why Choose [Business Name] in [City]".
+Intro blurb: 2–3 sentences, 30–50 words, business name exactly once.
+H3: use the Vertical Pack "Why Choose Us H3" pattern.
+Then "• **Label:**" bullets, 25–40 words each, every bullet a CLIENT-SPECIFIC differentiator drawn from BRAND IDENTITY (certifications, brand authorizations, process commitments, years of specialization, credentials). No generic claims. Milestones/awards/certs allowed here.
+[/WHY_CHOOSE_US]
+
+[GBP_REVIEW]
+H2: use the Vertical Pack "GBP Review H2" pattern.
+4 paragraphs, 150–200 words total: (1) opening attribution "One [family/homeowner/customer] in [City] shared… / highlighted…"; (2) weave the exact GBP REVIEW quote in italics mid-sentence: _"the exact quote"_ — reproduce verbatim; (3) follow-up expanding the sentiment; (4) closing tying back to the business's value. No milestones here.
+[/GBP_REVIEW]
+
+[FAQ]
+H2: "Frequently Asked Questions About [Keyword variation] in [City]".
+Number of H3 questions = number of links in INTERNAL LINKS FOR FAQ (if "none", write exactly 3 questions with no links). Each question is something a real prospect would ask (never dictated by a link's URL, never reads like a slug). Each answer 100–150 words. For each link, embed a keyword-variation [anchor](url) mid-paragraph. ZERO city mentions in any answer body — city only in the H3 question headings. No business name, no milestones.
+[/FAQ]
+
+[CLOSING]
+H2: use the Vertical Pack "Closing H2" pattern.
+One paragraph, 80–120 words, business name exactly once. If ADDRESS is not N/A, mention the physical address again as a natural location reference (second required placement). Milestones/awards/certs allowed.
+[/CLOSING]
+
+[IMAGE_2]
+ALT: <descriptive alt text for the closing image, distinct from IMAGE_1>
+FILENAME: <lowercase-hyphenated-descriptive>.jpg
+DOWNLOAD: [Google Drive link, original source link, or upload location]
+ORIGIN: [Client-provided / Pexels / Unsplash / Pixabay / StockSnap / AI-generated / Internally created]
+LICENSE: Checked official license page; approved for website use.
+AI_STATUS: [AI-generated / Not AI-generated]
+[/IMAGE_2]
+
+[CTA_3]
+URGENCY angle (use the Vertical Pack CTA_3 wording). DEATH CARE EXCEPTION: replace urgency with reassurance (presence/availability, never "act now"). Max 10 words, city once, ends with the PHONE number, no business name.
+[/CTA_3]
+
+[INFOGRAPHIC_PROMPT]
+A ready-to-paste ChatGPT/Gemini prompt to design an infographic. TOPIC completely different from this page's content (a complementary educational angle). 4–5 items MAX, each = one icon + one bold subtopic label only (no body copy). Labels large with generous whitespace. Footer = the target keyword ONLY (no website URL). Include this exact line: "I have attached a screenshot of the client's website homepage. Use it as your reference for the exact color palette, fonts, and overall visual style."
+[/INFOGRAPHIC_PROMPT]
+
+Before returning, silently self-check and fix any violations: city-name count equals 25 by the distribution above; business name appears once in only the 5 allowed sections; phone only in CTA_1 and CTA_3; no em-dashes; no dollar amounts; no year references; SGE/AIO has exactly 5 bullets and a 3-sentence H3 paragraph. Output ONLY the tagged sections, nothing else.`};
+
 /* ---------- Fields used to build the brief ---------- */
 const FIELDS = ["BUSINESS_NAME","WEBSITE_URL","PHONE","URL_SLUG","KEYWORD","CITY","STATE",
   "HAS_PHYSICAL_LOCATION","ADDRESS","INDUSTRY","VERTICAL","WRITING_VOICE",
@@ -671,22 +791,32 @@ function assemble(promptBody, brief, pack){
 
 function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
+function mode(){ return document.querySelector('input[name=mode]:checked').value; }
+
+function updateBtn(){
+  document.getElementById("genBtn").textContent =
+    mode()==="oneshot" ? "Generate prompts (Meta + Full Page)" : "Generate all 14 prompts";
+}
+
 function generate(){
   if(!val("BUSINESS_NAME") || !val("CITY") || !val("KEYWORD")){
     setStatus("Add at least Business Name, City, and Keyword first.", true);
   }
   const brief = buildBrief();
   const pack = PACKS[val("VERTICAL")];
+  // One-shot mode = Prompt 1 (Meta) + the Full Page master prompt. Section mode = all 14.
+  const list = mode()==="oneshot" ? [PROMPTS[0], FULLPAGE] : PROMPTS;
   const out = document.getElementById("output");
   out.innerHTML = "";
-  PROMPTS.forEach((p,i)=>{
+  list.forEach((p,i)=>{
     const full = assemble(p.body, brief, pack);
     const card = document.createElement("div");
     card.className = "card";
     const note = p.note ? `<span>— ${p.note}</span>` : "";
+    const label = (p.n==="FULL") ? p.title : `Prompt ${p.n} — ${p.title}`;
     card.innerHTML = `
       <div class="card-head">
-        <div class="t">Prompt ${p.n} — ${p.title}${note}</div>
+        <div class="t">${label}${note}</div>
         <button class="copy" data-i="${i}">Copy prompt</button>
       </div>
       <pre id="pre-${i}">${esc(full)}</pre>`;
@@ -702,7 +832,9 @@ function generate(){
       });
     });
   });
-  setStatus("Generated 14 prompts. Run Prompt 1 first, fill the Selected Meta Set, then regenerate.", false);
+  setStatus(mode()==="oneshot"
+    ? "Generated 2 prompts. Run the Meta prompt, fill the Selected Meta Set, regenerate, then copy the Full Page prompt."
+    : "Generated 14 prompts. Run Prompt 1 first, fill the Selected Meta Set, then regenerate.", false);
   window.scrollTo({top:document.getElementById("output").offsetTop-20,behavior:"smooth"});
 }
 
@@ -745,6 +877,8 @@ function clearAll(){
   document.getElementById("output").innerHTML='<div class="empty">Fill the brief and click <b>Generate</b>.</div>';
   setStatus("Cleared.", false);
 }
+
+updateBtn();
 </script>
 </body>
 </html>
