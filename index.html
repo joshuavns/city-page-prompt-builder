@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City Page — Section-by-Section Prompt Builder</title>
+<style>
+  :root{
+    --bg:#0f1216; --panel:#171c22; --panel2:#1d242c; --line:#2a323c;
+    --txt:#e6edf3; --muted:#9aa7b4; --accent:#3b82f6; --accent2:#22c55e;
+    --warn:#f59e0b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{padding:20px 24px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header h1{margin:0;font-size:19px}
+  header p{margin:6px 0 0;color:var(--muted);font-size:13px}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  fieldset{border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 18px;background:var(--panel)}
+  legend{padding:0 8px;font-weight:600;color:var(--accent)}
+  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+  input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:7px;color:var(--txt);padding:9px 11px;font:14px inherit}
+  textarea{resize:vertical;min-height:70px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  .hint{font-size:11px;color:var(--muted);margin-top:3px;text-transform:none;font-weight:400;letter-spacing:0}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .actions{display:flex;gap:12px;align-items:center;margin:8px 0 24px;flex-wrap:wrap}
+  button{cursor:pointer;border:none;border-radius:8px;font:600 14px inherit;padding:11px 18px}
+  .primary{background:var(--accent);color:#fff}
+  .primary:hover{background:#2f6fd6}
+  .ghost{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+  .ghost:hover{border-color:var(--accent)}
+  .pill{font-size:12px;color:var(--muted)}
+  #output{margin-top:8px}
+  .card{border:1px solid var(--line);border-radius:10px;margin:0 0 14px;background:var(--panel);overflow:hidden}
+  .card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:var(--panel2);border-bottom:1px solid var(--line)}
+  .card-head .t{font-weight:600}
+  .card-head .t span{color:var(--muted);font-weight:400;font-size:13px;margin-left:8px}
+  .copy{background:var(--accent2);color:#06230f;padding:7px 14px;border-radius:7px;font-weight:700;font-size:13px}
+  .copy.done{background:#16a34a;color:#fff}
+  pre{margin:0;padding:16px;white-space:pre-wrap;word-break:break-word;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;color:#cdd6df;max-height:340px;overflow:auto}
+  details summary{cursor:pointer;padding:8px 16px;color:var(--muted);font-size:13px}
+  .vpack-preview{font-size:12px;color:var(--muted);white-space:pre-wrap;background:var(--panel2);border:1px dashed var(--line);border-radius:8px;padding:12px;margin-top:8px;max-height:220px;overflow:auto;display:none}
+  .step{display:inline-block;background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;line-height:22px;text-align:center;font-size:12px;font-weight:700;margin-right:8px}
+  .note{background:#1c2433;border:1px solid #2c3a52;border-radius:8px;padding:12px 14px;font-size:13px;color:#bcd0ec;margin-bottom:18px}
+  .meta-after{border-color:var(--warn)}
+  .meta-after legend{color:var(--warn)}
+  .empty{color:var(--muted);text-align:center;padding:40px;border:1px dashed var(--line);border-radius:10px}
+</style>
+</head>
+<body>
+<header>
+  <h1>City Page — Section-by-Section Prompt Builder</h1>
+  <p>Fill the brief once → Generate → copy each prompt into a fresh ChatGPT (GPT-5.5) message. The brief + Vertical Pack are baked into every prompt automatically.</p>
+</header>
+
+<div class="wrap">
+  <div class="note">
+    <strong>Flow:</strong> Run <b>Prompt 1 (Meta)</b> first → pick a set → paste it into the <b>Selected Meta Set</b> fields below → click Generate again so Prompts 2–14 carry your chosen H1/title/description. Then run Prompts 2–14 in order. Assemble &amp; QA per Sections 15–16 of the SOP.
+  </div>
+
+  <fieldset>
+    <legend>Client Brief — core</legend>
+    <div class="row2">
+      <div><label>Business Name</label><input id="BUSINESS_NAME" placeholder="Affordable At Home Care"></div>
+      <div><label>Website URL</label><input id="WEBSITE_URL" placeholder="https://example.com"></div>
+    </div>
+    <div class="row3">
+      <div><label>Phone</label><input id="PHONE" placeholder="(555) 123-4567"></div>
+      <div><label>URL Slug</label><input id="URL_SLUG" placeholder="home-care-kennewick-wa"></div>
+      <div><label>Keyword (exact)</label><input id="KEYWORD" placeholder="home care services in Kennewick, WA"></div>
+    </div>
+    <div class="row3">
+      <div><label>City</label><input id="CITY" placeholder="Kennewick"></div>
+      <div><label>State</label><input id="STATE" placeholder="WA"></div>
+      <div><label>Has Physical Location?</label>
+        <select id="HAS_PHYSICAL_LOCATION"><option>Yes</option><option selected>No</option></select>
+      </div>
+    </div>
+    <div><label>Address <span class="hint">(full address, or leave blank / N/A if no physical location)</span></label><input id="ADDRESS" placeholder="N/A"></div>
+    <div class="row3">
+      <div><label>Industry</label><input id="INDUSTRY" placeholder="In-Home Care"></div>
+      <div><label>Vertical (picks the Pack)</label>
+        <select id="VERTICAL">
+          <option value="HOME_IMPROVEMENT">Home Improvement</option>
+          <option value="HOME_CARE" selected>Home Care</option>
+          <option value="DEATH_CARE">Death Care</option>
+        </select>
+      </div>
+      <div><label>Writing Voice</label>
+        <select id="WRITING_VOICE">
+          <option>First Person (we/our)</option>
+          <option>Third Person (business by name)</option>
+        </select>
+      </div>
+    </div>
+    <a href="#" id="togglePack" class="pill">▸ Preview the Vertical Pack that will be injected</a>
+    <div class="vpack-preview" id="packPreview"></div>
+  </fieldset>
+
+  <div class="grid">
+    <fieldset>
+      <legend>Brand Identity</legend>
+      <textarea id="BRAND_IDENTITY" placeholder="Years in business, family-owned, awards, certifications, accreditations, staff size, service-area reach, brand authorizations, process commitments..."></textarea>
+    </fieldset>
+    <fieldset>
+      <legend>GBP Review (verbatim)</legend>
+      <textarea id="GBP_REVIEW" placeholder="Paste one real Google Business Profile review, verbatim, including who left it."></textarea>
+    </fieldset>
+  </div>
+
+  <div class="grid">
+    <fieldset>
+      <legend>Services to Cover</legend>
+      <textarea id="SERVICES" style="min-height:130px" placeholder="List in exact order. For each:
+SERVICE: <name>
+URL: <service page URL or N/A>
+SUB-SERVICES: <one per line, or 'scrape URL' or 'none'>"></textarea>
+    </fieldset>
+    <fieldset>
+      <legend>Internal Links for FAQ</legend>
+      <textarea id="FAQ_LINKS" style="min-height:130px" placeholder="One URL per line. # of links = # of FAQ questions. Write 'none' for 3 link-free FAQs."></textarea>
+    </fieldset>
+  </div>
+
+  <div class="grid">
+    <fieldset>
+      <legend>Restrictions &amp; Keyword Research</legend>
+      <label>Client-wide restrictions</label>
+      <textarea id="CLIENT_RESTRICTIONS" placeholder="Anything banned across all of this client's pages, or N/A"></textarea>
+      <label>This location only — restrictions</label>
+      <textarea id="LOCATION_RESTRICTIONS" placeholder="Restrictions specific to this city page only, or N/A"></textarea>
+      <label>Keyword research</label>
+      <textarea id="KEYWORD_RESEARCH" placeholder="Secondary keywords / variations to weave in, or N/A"></textarea>
+    </fieldset>
+    <fieldset>
+      <legend>Context</legend>
+      <label>H1s already used for this client</label>
+      <textarea id="H1S_USED" placeholder="Paste H1s used on other city pages so they aren't repeated, or N/A"></textarea>
+      <label>SGE/AIO topic direction</label>
+      <textarea id="SGE_DIRECTION" placeholder="A specific audience pain-point angle to anchor SGE/AIO, or N/A"></textarea>
+    </fieldset>
+  </div>
+
+  <fieldset class="meta-after">
+    <legend>Selected Meta Set — fill AFTER running Prompt 1</legend>
+    <div><label>Selected H1</label><input id="SELECTED_H1" placeholder="Run Prompt 1, pick a set, paste its H1 here"></div>
+    <div class="row2">
+      <div><label>Selected Meta Title</label><input id="SELECTED_META_TITLE"></div>
+      <div><label>Selected Meta Description</label><input id="SELECTED_META_DESCRIPTION"></div>
+    </div>
+  </fieldset>
+
+  <div class="actions">
+    <button class="primary" onclick="generate()">Generate all 14 prompts</button>
+    <button class="ghost" onclick="saveBrief()">Save brief to browser</button>
+    <button class="ghost" onclick="loadBrief()">Load saved brief</button>
+    <button class="ghost" onclick="clearAll()">Clear</button>
+    <span class="pill" id="status"></span>
+  </div>
+
+  <div id="output"><div class="empty">Fill the brief and click <b>Generate</b>. Your 14 copy-ready prompts will appear here.</div></div>
+</div>
+
+<script>
+/* ---------- Vertical Packs (verbatim from the SOP) ---------- */
+const PACKS = {
+HOME_IMPROVEMENT:
+`=== VERTICAL PACK: HOME IMPROVEMENT ===
+AUDIENCE_NOUN: homeowners (address "you / your home"; never default to "families")
+TONE: Confident, expert, benefit- and ROI-driven. Reassure against fly-by-night/scam fears. Energetic but professional. Not sentimental.
+
+HEADING OVERRIDES:
+- Why Choose Us H3 → "Why [City] Homeowners Choose Us"
+- GBP Review H2 → "What [City] Homeowners Are Saying About Our Work"  (replace "Our Care" with "Our Work")
+- Closing H2 → "[Service Type] in [City], [State] You Can Trust"  (or "...Done Right")
+
+CTA ANGLES:
+- CTA_1 (action): invite a free estimate/quote. e.g. "Get your free [City] estimate today."
+- CTA_2 (value): warranty / quality / financing value. No phone.
+- CTA_3 (urgency): real urgency is fine — seasonal, storm, energy savings. e.g. "Beat the [season] rush — call today."
+
+WORDING — USE: free estimate, free quote, financing, warranty, licensed & insured, installation, upgrade, energy efficiency, curb appeal, inspection.
+WORDING — AVOID: "loved ones," "compassionate," "family" as the buyer, grief/care language.
+
+LEAD TRUST SIGNALS (Intro P2 + Why Choose Us): licensing, manufacturer certifications, warranties, financing, insurance-claim expertise (roofing), years in business, local reviews.
+FAQ TOPIC STEER: what affects price, financing options, warranty coverage, project timeline, permits/inspections, maintenance.
+INFOGRAPHIC ANGLE: buyer's-guide education, e.g. "5 Signs You Need a New Roof," "How to Choose Energy-Efficient Windows."`,
+
+HOME_CARE:
+`=== VERTICAL PACK: HOME CARE ===
+AUDIENCE_NOUN: families (often the adult child) — address "you" as the decision-maker, refer to "your loved one"
+TONE: Compassionate, reassuring, family-centered, AND practical/credible. Home Health: clinical-but-warm, credibility-forward.
+
+HEADING OVERRIDES:
+- Why Choose Us H3 → "Our Promise to [City] Families"  (keep)
+- GBP Review H2 → "What [City] Families Are Saying About Our Care"  (keep)
+- Closing H2 → "[Service Type] in [City], [State] Your Family Can Count On"  (keep)
+
+CTA ANGLES:
+- CTA_1 (action): warm invitation to talk/assess. e.g. "Talk to a [City] care advisor today."
+- CTA_2 (value): reassurance about trust/consistency. No phone.
+- CTA_3 (urgency → gentle): supportive, not pushy. e.g. "Start care when your family is ready — call us."
+
+WORDING — USE: caregivers, loved one, independence, safety, peace of mind, consistent care, family communication, vetted/screened, dignity. (Home Health also: skilled, clinical, Medicare/Medicaid-covered.)
+WORDING — AVOID: sales language (deal, quote, upgrade), hard urgency/scarcity, transactional tone.
+
+LEAD TRUST SIGNALS: caregiver vetting/screening, credentials/licensing, consistent caregiver assignment, family communication, years serving, flexible scheduling.
+FAQ TOPIC STEER: how to get started, what's covered / how to pay (Medicare/Medicaid for home health), how caregivers are matched and screened, scheduling flexibility, what services are included.
+INFOGRAPHIC ANGLE: reassurance/education, e.g. "Signs a Loved One May Need Help at Home," "Questions to Ask a Home Care Provider."`,
+
+DEATH_CARE:
+`=== VERTICAL PACK: DEATH CARE ===
+AUDIENCE_NOUN: families / loved ones (never "customers")
+TONE: Reverent, gentle, deeply compassionate, unhurried. NEVER transactional, NEVER salesy, NEVER urgent or scarcity-driven. Hospice: especially sensitive and supportive.
+
+HEADING OVERRIDES:
+- Why Choose Us H3 → "Our Commitment to [City] Families"
+- GBP Review H2 → "What [City] Families Say About Our Care"
+- Closing H2 → "Compassionate [Service Type] for [City], [State] Families"  (do NOT use salesy "Count On / Done Right" phrasing)
+
+CTA ANGLES:
+- CTA_1 (action → gentle invitation): e.g. "Reach out for caring guidance, anytime."
+- CTA_2 (value → reassurance of dignity/support). No phone.
+- CTA_3 (REPLACE URGENCY WITH REASSURANCE): no "act now," no scarcity. Offer presence and availability. e.g. "We're here for [City] families whenever you need us." (Still END with the phone number — that universal rule stays.)
+
+WORDING — USE: honor, remembrance, dignity, guidance, compassionate, peace of mind, support, pre-planning, celebrate a life, loved one.
+WORDING — AVOID: deal, sale, quote, discount, "act now," "limited time," urgency/scarcity, "customers," upbeat/peppy tone.
+
+LEAD TRUST SIGNALS: years/generations serving the community, family-owned heritage, compassion, community standing, options offered with no pressure.
+FAQ TOPIC STEER: what to expect / first steps, pre-planning options and their benefits, cremation vs. burial options, how costs are handled (sensitively, no exact dollar figures), honoring a loved one's wishes.
+INFOGRAPHIC ANGLE: gentle education, e.g. "Steps in Planning a Meaningful Service," "Understanding Your Options" — never promotional.`
+};
+
+/* ---------- Section prompts (verbatim from the SOP, brief placeholder stripped) ---------- */
+const PROMPTS = [
+{n:1,title:"Meta Tags (5 sets)",note:"Run first → pick a set → fill Selected Meta Set",body:
+`You are an expert SEO content writer for Ring Ring Marketing specializing in local city pages. Follow every rule exactly.
+
+TASK: Produce EXACTLY 5 sets of Meta Title + H1 + Meta Description for the city page described in the Client Brief below. Output ONLY the 5 sets — no other sections, no commentary.
+
+GLOBAL RULES:
+- No em-dashes (—) anywhere — use a comma or a hyphen (-).
+- Active voice. No buzzwords: embark, uncover, unveil, transform, revolutionize.
+- Conversational but professional. Match the INDUSTRY tone.
+
+META TITLE (each set):
+- Format: power word + the EXACT target keyword + city & state.
+- The exact KEYWORD string must appear here — and ONLY here (never in the H1).
+- Max 58 characters including spaces (aim 56–58).
+- Business name must NOT appear — not even abbreviated.
+- Use a hyphen ( - ) as the separator, never a pipe ( | ).
+- All 5 titles unique.
+
+H1 (each set):
+- A close natural variation of the keyword — NEVER the exact keyword string.
+- Format: [trust/quality adjective] + [service] + [in/for] + [City, State] + [audience or value qualifier].
+- 55–85 characters. City and state embedded mid-phrase, not bolted on the end.
+- End with an audience phrase or differentiator (e.g. "Senior Residents," "You Can Count On," "for Every Family").
+- No business name. Must differ from the Meta Title.
+- Do not repeat or closely echo any H1 listed in "H1S ALREADY USED."
+
+META DESCRIPTION (each set):
+- 140–160 characters including spaces.
+- This is the ONLY field where the business name is allowed.
+- Use an SEO variation of the keyword (not the exact phrase).
+- End with a short CTA (e.g. "Call today." / "Get started today.") — never include the phone number.
+- Set 1 & 2: begin with a question ("Looking for…?", "Need…?").
+- Set 3: business name at the BEGINNING.
+- Set 4: business name in the MIDDLE.
+- Set 5: business name at the END.
+
+OUTPUT FORMAT (exactly this, nothing else):
+---Set 1:
+Meta Title:
+H1:
+Meta Description:
+
+---Set 2:
+Meta Title:
+H1:
+Meta Description:
+
+---Set 3:
+Meta Title:
+H1:
+Meta Description:
+
+---Set 4:
+Meta Title:
+H1:
+Meta Description:
+
+---Set 5:
+Meta Title:
+H1:
+Meta Description: `},
+
+{n:2,title:"Intro",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [INTRO] section for the city page in the Client Brief below, using the SELECTED_H1.
+
+GLOBAL RULES: No em-dashes; no exact dollar amounts; no year references; active voice; no buzzwords (embark, uncover, unveil, transform, revolutionize); follow WRITING_VOICE; match INDUSTRY tone. Formatting markers: **bold**, _italic_, [anchor](url).
+
+SECTION RULES:
+- Two paragraphs, 80–120 words total.
+- Paragraph 1: target audience + local qualifier + the problem/situation. Bold a close natural variation of the keyword ONCE using **variation** — never the exact keyword string.
+- Paragraph 2: EEAT credentials FIRST. Open with the most compelling trust signals from BRAND IDENTITY (years in business, family-owned, awards, certifications, accreditations, staff size, service-area reach). No generic openers like "our experienced team." Every credential in BRAND IDENTITY (years in business / family-owned / awards / certs) must appear here. Then layer in expectation-setting and a soft CTA setup.
+- The business name appears EXACTLY ONCE in the whole intro (in paragraph 2).
+- If ADDRESS is not N/A, weave the physical address into paragraph 2 as a natural location reference (e.g. "conveniently located at …"), not a raw string.
+- City name must appear EXACTLY 3 times across the intro.
+
+OUTPUT FORMAT (exactly this, nothing else):
+[INTRO]
+<paragraph 1>
+
+<paragraph 2>
+[/INTRO]`},
+
+{n:3,title:"Image Block 1 (hero)",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [IMAGE_1] block for the city page in the Client Brief below. This is the hero/intro image.
+
+SECTION RULES:
+- ALT: descriptive, natural alt text relevant to the service and city. No keyword stuffing.
+- FILENAME: lowercase, hyphenated, descriptive .jpg filename.
+- The DOWNLOAD, ORIGIN, LICENSE, AI_STATUS fields are placeholders for the team to confirm — fill with the bracketed options.
+
+OUTPUT FORMAT (exactly this, nothing else):
+[IMAGE_1]
+ALT: <descriptive alt text>
+FILENAME: <suggested-image-filename>.jpg
+DOWNLOAD: [Client-provided / stock source / AI-generated]
+ORIGIN: [Client-provided / Pexels / Unsplash / Pixabay / StockSnap / AI-generated / Internally created]
+LICENSE: Checked official license page; approved for website use.
+AI_STATUS: [AI-generated / Not AI-generated]
+[/IMAGE_1]`},
+
+{n:4,title:"CTA 1 (action angle)",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [CTA_1] block for the city page in the Client Brief below.
+
+SECTION RULES:
+- ACTION angle — invite the reader to reach out. Use the CTA_1 wording/angle from your Vertical Pack (e.g. "free estimate" for home improvement; a gentle "reach out for guidance" for death care — never a hard push).
+- Short and punchy: no more than 10 words.
+- Mention the city (or county) once.
+- END with the PHONE number from the brief.
+- NEVER include the business name.
+- No em-dashes.
+
+OUTPUT FORMAT (exactly this, nothing else):
+[CTA_1]
+<action-angle CTA ending with the phone number>
+[/CTA_1]`},
+
+{n:5,title:"SGE / AIO",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [SGE_AIO] section for the city page in the Client Brief below.
+
+GLOBAL RULES: No em-dashes; no dollar amounts; no year references; active voice; no buzzwords; follow WRITING_VOICE; match INDUSTRY tone.
+
+SECTION RULES:
+- H2 pattern: "What [Audience] in [City] Face When [Service Situation]".
+- One H3 that is a STATEMENT phrase, never a question.
+- Under the H3: a paragraph of EXACTLY 3 sentences (~50–75 words) about local conditions specific to this city. The business name appears EXACTLY ONCE, naturally, in one of these 3 sentences.
+- Then EXACTLY 5 bullets, each using the • character: "• **Bold Label:** one fully optimized, self-contained sentence."
+- Each bullet must cover a COMPLETELY DISTINCT dimension (e.g. cost, timing/urgency, provider selection, family dynamics, safety/health, legal/regulatory, local availability). No two bullets may overlap, and no bullet may restate anything in the H3 paragraph.
+- Do NOT mention milestones, awards, or certifications anywhere in this section.
+- City name appears EXACTLY 3 times — in the H2 and H3 paragraph ONLY (not in the bullets).
+- If SGE/AIO TOPIC DIRECTION is provided in the brief, use it as the lens for the H2, H3 paragraph, and all 5 bullets.
+
+OUTPUT FORMAT (exactly this, nothing else):
+[SGE_AIO]
+H2: <heading>
+H3: <statement phrase>
+<three-sentence paragraph, business name once>
+
+• **Label:** <sentence>
+• **Label:** <sentence>
+• **Label:** <sentence>
+• **Label:** <sentence>
+• **Label:** <sentence>
+[/SGE_AIO]`},
+
+{n:6,title:"Services",note:"handles manual / scrape-URL / standard cases",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [SERVICES] section for the city page in the Client Brief below. Cover exactly the services in SERVICES TO COVER, in the listed order. Do not add or invent services.
+
+GLOBAL RULES: No em-dashes; no dollar amounts; no year references; active voice; no buzzwords; follow WRITING_VOICE; match INDUSTRY tone. Formatting markers: **bold**, [anchor](url).
+
+SECTION-INTRO RULES:
+- H2 pattern: "[Service Type] Services in [City], [State]".
+- Short intro blurb: 2–3 sentences, 30–50 words. Mention the city and a primary-keyword variation. End with a soft transition into the services. NO business name.
+
+PER-SERVICE RULES (apply per entry in SERVICES TO COVER):
+- If the service lists SUB-SERVICES: write exactly one H3 per sub-service listed. Each H3 = EXACTLY 2 sentences (sentence 1: what it is + primary benefit; sentence 2: a specific application, upgrade option, local use case, or installation detail). Use ONLY the listed sub-services.
+- If the service says "scrape URL" and there are 4 or fewer total services: identify the sub-services on that page and write one H3 each (same 2-sentence rule). If the page lists more than 5 sub-services, group by logical category and write one H3 per category (2–3 sentences each). If the page covers only one service, use the standard description (below) instead.
+- If there are 5+ services total, or the service has no sub-services: write a standard 60–90 word description structured as (1) when it's needed, (2) local factors, (3) practical outcome. No H3 sub-services.
+- For EVERY service that has a URL: embed [anchor text](url) IN THE MIDDLE of that service's paragraph. Anchor text must be a keyword variation of the linked page's topic — never the exact service name, never generic ("learn more"), never with trailing city/state. Do not skip any URL.
+
+GLOBAL SECTION RULES:
+- NO business name anywhere in this section.
+- NO milestones, awards, or certifications in this section.
+- City name appears EXACTLY 6 times total across this section (H2 + blurb + service descriptions).
+
+OUTPUT FORMAT (exactly this, nothing else):
+[SERVICES]
+H2: <heading>
+<intro blurb, 30–50 words>
+
+H3: <Service or Sub-Service Name>
+<description per the rules above>
+
+H3: <next>
+<description>
+[/SERVICES]`},
+
+{n:7,title:"CTA 2 (value angle, NO phone)",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [CTA_2] block for the city page in the Client Brief below.
+
+SECTION RULES (CRITICAL):
+- VALUE angle — reinforce what makes this business worth choosing. Use the CTA_2 wording/angle from your Vertical Pack (e.g. warranty/financing value for home improvement; reassurance of trust/dignity for care and death care).
+- Short and punchy: no more than 10 words.
+- Mention the city once.
+- End with a value-driven invitation, NOT a "call now" instruction.
+- NEVER include the business name.
+- NEVER include a phone number. CTA_2 must contain ZERO digits that form a phone number — phone numbers belong only in CTA_1 and CTA_3. This is a hard rule.
+- No em-dashes.
+
+OUTPUT FORMAT (exactly this, nothing else):
+[CTA_2]
+<value-angle CTA, no phone number>
+[/CTA_2]`},
+
+{n:8,title:"Infographic Prompt",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [INFOGRAPHIC_PROMPT] block — a ready-to-paste prompt the team will give to ChatGPT or Gemini to design an infographic for this city page.
+
+SECTION RULES:
+- The infographic TOPIC must be COMPLETELY DIFFERENT from the page's written content (a complementary educational angle, not a restatement of the services/SGE content).
+- Design: 4–5 items MAX. Each item = one icon + one bold subtopic label ONLY. No descriptive text or body copy under any item.
+- Labels must be large and prominent, with generous whitespace between items.
+- Footer: the target keyword ONLY. Do NOT include the website URL (infographics are images; URLs aren't clickable).
+- Include this exact line in the prompt: "I have attached a screenshot of the client's website homepage. Use it as your reference for the exact color palette, fonts, and overall visual style."
+
+OUTPUT FORMAT (exactly this, nothing else):
+[INFOGRAPHIC_PROMPT]
+<full ChatGPT/Gemini-ready infographic prompt following the rules above>
+[/INFOGRAPHIC_PROMPT]`},
+
+{n:9,title:"Why Choose Us",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [WHY_CHOOSE_US] section for the city page in the Client Brief below.
+
+GLOBAL RULES: No em-dashes; no dollar amounts; no year references; active voice; no buzzwords; follow WRITING_VOICE; match INDUSTRY tone.
+
+SECTION RULES:
+- H2 pattern: "Why Choose [Business Name] in [City]".
+- Short intro blurb: 2–3 sentences, 30–50 words. The business name appears EXACTLY ONCE here.
+- Then an H3 using the "Why Choose Us H3" pattern from your Vertical Pack (e.g. "Our Promise to [City] Families" for care/death care, or "Why [City] Homeowners Choose Us" for home improvement).
+- Then bullets using the • character, 25–40 words each. Each bullet = a CLIENT-SPECIFIC differentiator tied to evidence, process, or proof drawn from BRAND IDENTITY (certifications, brand authorizations, process commitments, years of specialization, credentials). No generic claims.
+- Milestones, awards, and certifications ARE allowed in this section.
+- City name appears EXACTLY 4 times total (H2 + H3 + blurb + one bullet).
+
+OUTPUT FORMAT (exactly this, nothing else):
+[WHY_CHOOSE_US]
+H2: Why Choose <Business Name> in <City>
+<intro blurb, business name once>
+
+H3: <use the Why Choose Us H3 pattern from your Vertical Pack>
+
+• **Label:** <differentiator>
+• **Label:** <differentiator>
+• **Label:** <differentiator>
+[/WHY_CHOOSE_US]`},
+
+{n:10,title:"GBP Review",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [GBP_REVIEW] section for the city page in the Client Brief below, built around the review in the GBP REVIEW field.
+
+GLOBAL RULES: No em-dashes; no dollar amounts; no year references; active voice; no buzzwords; follow WRITING_VOICE; match INDUSTRY tone.
+
+SECTION RULES:
+- H2: use the "GBP Review H2" pattern from your Vertical Pack (e.g. "What [City] Homeowners Are Saying About Our Work" for home improvement; "What [City] Families Are Saying About Our Care" for care/death care).
+- 4 paragraphs, 150–200 words total:
+  1) Opening that introduces the review. Begin with a natural attribution like "One [family/homeowner/customer] in [City] shared…" or "…highlighted…".
+  2) A paragraph weaving in the actual review with the exact quote in italics mid-sentence: _"the exact quote text"_.
+  3) A follow-up expanding on the sentiment.
+  4) A closing tying back to the business's value.
+- Do NOT mention milestones, awards, or certifications here.
+- City name appears EXACTLY 2 times (H2 + the opening attribution line only).
+
+OUTPUT FORMAT (exactly this, nothing else):
+[GBP_REVIEW]
+H2: <heading>
+
+<paragraph 1>
+
+<paragraph 2 with _"quote"_ mid-sentence>
+
+<paragraph 3>
+
+<paragraph 4>
+[/GBP_REVIEW]`},
+
+{n:11,title:"FAQ",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [FAQ] section for the city page in the Client Brief below.
+
+GLOBAL RULES: No em-dashes; no dollar amounts; no year references; active voice; no buzzwords; follow WRITING_VOICE; match INDUSTRY tone. Formatting markers: **bold**, [anchor](url).
+
+SECTION RULES:
+- Number of questions = number of links in INTERNAL LINKS FOR FAQ (one question per link). If "none," write exactly 3 questions with no links.
+- H2 pattern: "Frequently Asked Questions About [Keyword variation] in [City]".
+- Each question is an H3 and may include the city name.
+- Each question must be something a REAL prospect in this niche would genuinely ask — about the service, process, costs, timelines, qualifications, or outcomes. The URL of a link must NEVER dictate the question topic, and a question must never read like a URL slug or nav label.
+- Each answer: 100–150 words.
+- For each internal link, embed its anchor text naturally IN THE MIDDLE of that answer's paragraph (not the start, not the end). Anchor must be a keyword variation of the linked page's topic — never generic ("learn more," "click here"), never the exact service name.
+- CRITICAL: the city name must appear ZERO times in any FAQ ANSWER BODY. The city may appear ONLY in the H3 question headings.
+- No business name. No milestones/awards/certifications.
+- City name appears EXACTLY 3 times total — all in headings (H2 + 2 question H3s); zero in answer bodies.
+
+OUTPUT FORMAT (exactly this, nothing else):
+[FAQ]
+H2: <heading>
+
+H3: <Question one, may include city>?
+<answer, ZERO city mentions, anchor link mid-paragraph if applicable>
+
+H3: <Question two, may include city>?
+<answer, ZERO city mentions, anchor link mid-paragraph if applicable>
+[/FAQ]`},
+
+{n:12,title:"Closing",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [CLOSING] section for the city page in the Client Brief below.
+
+GLOBAL RULES: No em-dashes; no dollar amounts; no year references; active voice; no buzzwords; follow WRITING_VOICE; match INDUSTRY tone.
+
+SECTION RULES:
+- H2: use the "Closing H2" pattern from your Vertical Pack (e.g. "[Service Type] in [City], [State] You Can Trust" for home improvement; "...Your Family Can Count On" for home care; "Compassionate [Service Type] for [City], [State] Families" for death care — never salesy phrasing for death care).
+- One closing paragraph, 80–120 words. The business name appears EXACTLY ONCE.
+- Milestones, awards, and certifications ARE allowed here.
+- If ADDRESS is not N/A, the physical address MUST be mentioned again here as a natural location reference (this is its second required placement, after the Intro).
+- City name appears EXACTLY 4 times total (H2 + body + two closing references).
+
+OUTPUT FORMAT (exactly this, nothing else):
+[CLOSING]
+H2: <heading>
+<closing paragraph, business name once, address if applicable>
+[/CLOSING]`},
+
+{n:13,title:"Image Block 2 (closing)",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [IMAGE_2] block for the city page in the Client Brief below. This is the closing image.
+
+SECTION RULES:
+- ALT: descriptive, natural alt text relevant to the service and city, distinct from the hero image.
+- FILENAME: lowercase, hyphenated, descriptive .jpg filename.
+- The DOWNLOAD, ORIGIN, LICENSE, AI_STATUS fields are placeholders for the team to confirm.
+
+OUTPUT FORMAT (exactly this, nothing else):
+[IMAGE_2]
+ALT: <descriptive alt text for the closing image>
+FILENAME: <suggested-closing-image>.jpg
+DOWNLOAD: [Google Drive link, original source link, or upload location]
+ORIGIN: [Client-provided / Pexels / Unsplash / Pixabay / StockSnap / AI-generated / Internally created]
+LICENSE: Checked official license page; approved for website use.
+AI_STATUS: [AI-generated / Not AI-generated]
+[/IMAGE_2]`},
+
+{n:14,title:"CTA 3 (urgency angle)",body:
+`You are an expert SEO content writer for Ring Ring Marketing. Follow every rule exactly.
+
+TASK: Write ONLY the [CTA_3] block for the city page in the Client Brief below.
+
+SECTION RULES:
+- ANGLE — follow your Vertical Pack's CTA_3 guidance. Default is an URGENCY angle (strongest push, a final reason to act now). DEATH CARE EXCEPTION: replace urgency with REASSURANCE — offer presence and availability, never "act now" or scarcity.
+- Short and punchy: no more than 10 words.
+- Mention the city once.
+- END with the PHONE number from the brief (this applies even for the death-care reassurance version).
+- NEVER include the business name.
+- No em-dashes.
+
+OUTPUT FORMAT (exactly this, nothing else):
+[CTA_3]
+<urgency-angle CTA ending with the phone number>
+[/CTA_3]`}
+];
+
+/* ---------- Fields used to build the brief ---------- */
+const FIELDS = ["BUSINESS_NAME","WEBSITE_URL","PHONE","URL_SLUG","KEYWORD","CITY","STATE",
+  "HAS_PHYSICAL_LOCATION","ADDRESS","INDUSTRY","VERTICAL","WRITING_VOICE",
+  "BRAND_IDENTITY","GBP_REVIEW","CLIENT_RESTRICTIONS","LOCATION_RESTRICTIONS","KEYWORD_RESEARCH",
+  "SERVICES","FAQ_LINKS","H1S_USED","SGE_DIRECTION",
+  "SELECTED_H1","SELECTED_META_TITLE","SELECTED_META_DESCRIPTION"];
+
+const VLABEL = {HOME_IMPROVEMENT:"Home Improvement",HOME_CARE:"Home Care",DEATH_CARE:"Death Care"};
+
+function val(id){ return (document.getElementById(id).value || "").trim(); }
+function orNA(v){ return v ? v : "N/A"; }
+
+function buildBrief(){
+  const v = id => orNA(val(id));
+  return `=== CLIENT BRIEF ===
+BUSINESS_NAME: ${v("BUSINESS_NAME")}
+WEBSITE_URL: ${v("WEBSITE_URL")}
+PHONE: ${v("PHONE")}
+URL_SLUG: ${v("URL_SLUG")}
+KEYWORD: ${v("KEYWORD")}
+CITY: ${v("CITY")}
+STATE: ${v("STATE")}
+HAS_PHYSICAL_LOCATION: ${val("HAS_PHYSICAL_LOCATION")}
+ADDRESS: ${v("ADDRESS")}
+INDUSTRY: ${v("INDUSTRY")}
+VERTICAL: ${VLABEL[val("VERTICAL")]}
+WRITING_VOICE: ${val("WRITING_VOICE")}
+
+=== BRAND IDENTITY ===
+${v("BRAND_IDENTITY")}
+
+=== GBP REVIEW ===
+${v("GBP_REVIEW")}
+
+=== CLIENT-WIDE RESTRICTIONS ===
+${v("CLIENT_RESTRICTIONS")}
+
+=== THIS LOCATION ONLY — RESTRICTIONS ===
+${v("LOCATION_RESTRICTIONS")}
+
+=== KEYWORD RESEARCH ===
+${v("KEYWORD_RESEARCH")}
+
+=== SERVICES TO COVER ===
+${v("SERVICES")}
+
+=== INTERNAL LINKS FOR FAQ ===
+${v("FAQ_LINKS")}
+
+=== H1S ALREADY USED FOR THIS CLIENT ===
+${v("H1S_USED")}
+
+=== SGE/AIO TOPIC DIRECTION ===
+${v("SGE_DIRECTION")}
+
+=== SELECTED META SET ===
+SELECTED_H1: ${v("SELECTED_H1")}
+SELECTED_META_TITLE: ${v("SELECTED_META_TITLE")}
+SELECTED_META_DESCRIPTION: ${v("SELECTED_META_DESCRIPTION")}
+=== END BRIEF ===`;
+}
+
+function assemble(promptBody, brief, pack){
+  return `${promptBody}\n\n${brief}\n\n${pack}`;
+}
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function generate(){
+  if(!val("BUSINESS_NAME") || !val("CITY") || !val("KEYWORD")){
+    setStatus("Add at least Business Name, City, and Keyword first.", true);
+  }
+  const brief = buildBrief();
+  const pack = PACKS[val("VERTICAL")];
+  const out = document.getElementById("output");
+  out.innerHTML = "";
+  PROMPTS.forEach((p,i)=>{
+    const full = assemble(p.body, brief, pack);
+    const card = document.createElement("div");
+    card.className = "card";
+    const note = p.note ? `<span>— ${p.note}</span>` : "";
+    card.innerHTML = `
+      <div class="card-head">
+        <div class="t">Prompt ${p.n} — ${p.title}${note}</div>
+        <button class="copy" data-i="${i}">Copy prompt</button>
+      </div>
+      <pre id="pre-${i}">${esc(full)}</pre>`;
+    out.appendChild(card);
+  });
+  out.querySelectorAll(".copy").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const i = btn.getAttribute("data-i");
+      const txt = document.getElementById("pre-"+i).innerText;
+      navigator.clipboard.writeText(txt).then(()=>{
+        btn.textContent="Copied ✓"; btn.classList.add("done");
+        setTimeout(()=>{btn.textContent="Copy prompt"; btn.classList.remove("done");},1500);
+      });
+    });
+  });
+  setStatus("Generated 14 prompts. Run Prompt 1 first, fill the Selected Meta Set, then regenerate.", false);
+  window.scrollTo({top:document.getElementById("output").offsetTop-20,behavior:"smooth"});
+}
+
+function setStatus(msg,warn){
+  const s=document.getElementById("status");
+  s.textContent=msg; s.style.color = warn ? "var(--warn)" : "var(--accent2)";
+}
+
+/* ---------- Vertical Pack preview ---------- */
+document.getElementById("togglePack").addEventListener("click",e=>{
+  e.preventDefault();
+  const box=document.getElementById("packPreview");
+  if(box.style.display==="block"){ box.style.display="none"; return; }
+  box.textContent = PACKS[val("VERTICAL")];
+  box.style.display="block";
+});
+document.getElementById("VERTICAL").addEventListener("change",()=>{
+  const box=document.getElementById("packPreview");
+  if(box.style.display==="block") box.textContent = PACKS[val("VERTICAL")];
+});
+
+/* ---------- Save / load brief (localStorage) ---------- */
+function saveBrief(){
+  const data={}; FIELDS.forEach(id=>data[id]=document.getElementById(id).value);
+  localStorage.setItem("rrm_city_brief", JSON.stringify(data));
+  setStatus("Brief saved in this browser.", false);
+}
+function loadBrief(){
+  const raw=localStorage.getItem("rrm_city_brief");
+  if(!raw){ setStatus("No saved brief found.", true); return; }
+  const data=JSON.parse(raw);
+  FIELDS.forEach(id=>{ if(data[id]!==undefined) document.getElementById(id).value=data[id]; });
+  setStatus("Brief loaded.", false);
+}
+function clearAll(){
+  FIELDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el.tagName==="SELECT") el.selectedIndex=0; else el.value="";
+  });
+  document.getElementById("output").innerHTML='<div class="empty">Fill the brief and click <b>Generate</b>.</div>';
+  setStatus("Cleared.", false);
+}
+</script>
+</body>
+</html>
