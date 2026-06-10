@@ -212,7 +212,7 @@
     </label>
     <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-weight:500;color:var(--txt);margin:4px 0">
       <input type="radio" name="mode" value="sections" style="width:auto" onchange="updateBtn()">
-      <span><b>Section-by-section</b> — 14 separate prompts, one per section. Last resort / surgical regeneration of a single section.</span>
+      <span><b>City Page Draft Prompts</b> — one prompt per section (14 total). Run them individually and assemble, or regenerate a single section.</span>
     </label>
   </fieldset>
 
@@ -479,6 +479,7 @@ GLOBAL SECTION RULES:
 - NO milestones, awards, or certifications in this section.
 - City name appears EXACTLY 6 times total across this section (H2 + blurb + service descriptions).
 - Wrap every service/sub-service heading in <h3>...</h3> tags (e.g. "<h3>Air Conditioning</h3>"). Never output a bare heading line without the <h3> tags.
+- Keep each description focused on the service itself (when it is needed / local factors / outcome). Do NOT repeat the broader educational points that belong in the SGE/AIO section, so Services and SGE/AIO do not overlap.
 
 OUTPUT FORMAT (exactly this, nothing else):
 <h2><heading></h2>
@@ -513,7 +514,7 @@ OUTPUT FORMAT (exactly this, nothing else):
 TASK: Write ONLY the [INFOGRAPHIC_PROMPT] block — a ready-to-paste prompt the team will give to ChatGPT or Gemini to design an infographic for this city page.
 
 SECTION RULES:
-- TOPIC CONTROL: If INFOGRAPHIC TOPIC is provided in the brief (not "Auto"), the infographic MUST be about exactly that topic. If it is "Auto", choose one yourself. Either way the topic must be COMPLETELY DIFFERENT from the page's written content (a complementary educational angle, not a restatement of the services/SGE content) and must NOT appear in "INFOGRAPHIC TOPICS ALREADY USED".
+- TOPIC CONTROL: If INFOGRAPHIC TOPIC is provided in the brief (not "Auto"), the infographic MUST be about exactly that topic. If it is "Auto", choose one yourself. Either way the topic must be COMPLETELY DIFFERENT from the page's written content — do not reuse any SGE/AIO subtopic, the Services covered, or anything in the Why Choose Us / FAQ / Closing — and must NOT appear in "INFOGRAPHIC TOPICS ALREADY USED".
 - 4–5 items MAX. Each item = one icon + one large bold subtopic label ONLY. No descriptive text or body copy under any item.
 - Footer text = the target keyword ONLY (no website URL).
 - Match the tone to the Vertical Pack TONE and the INDUSTRY.
@@ -1211,6 +1212,17 @@ function servicesBriefText(){
   }).join("\n\n");
 }
 
+// The document top block, assembled from the brief + chosen meta set (deterministic, no AI).
+function metaBlock(){
+  const v = id => orNA(val(id));
+  let url = val("WEBSITE_URL"); const slug = val("URL_SLUG");
+  if(url && slug){ url = url.replace(/\/+$/,"") + "/" + slug.replace(/^\/+|\/+$/g,"") + "/"; }
+  return (url||"<WEBSITE_URL + URL_SLUG>") +
+    "\nMeta Title: " + v("SELECTED_META_TITLE") +
+    "\nMeta Description: " + v("SELECTED_META_DESCRIPTION") +
+    "\nDownload all images:\n\n<h1>" + v("SELECTED_H1") + "</h1>";
+}
+
 function buildBrief(){
   const v = id => orNA(val(id));
   return `=== CLIENT BRIEF ===
@@ -1307,13 +1319,26 @@ function generate(){
       <pre id="pre-${i}">${esc(full)}</pre>`;
     out.appendChild(card);
   });
+  // In City Page Draft Prompts mode, add the assembled meta header (no AI needed) at the very top.
+  if(mode()!=="oneshot"){
+    const meta=document.createElement("div");
+    meta.className="card";
+    meta.innerHTML = `
+      <div class="card-head">
+        <div class="t">Meta header — paste at the very top of the doc <span>— assembled from your Selected Meta Set, no prompt needed</span></div>
+        <button class="copy" data-i="meta">Copy header</button>
+      </div>
+      <pre id="pre-meta">${esc(metaBlock())}</pre>`;
+    out.insertBefore(meta, out.firstChild);
+  }
   out.querySelectorAll(".copy").forEach(btn=>{
+    const orig = btn.textContent;
     btn.addEventListener("click",()=>{
       const i = btn.getAttribute("data-i");
       const txt = document.getElementById("pre-"+i).innerText;
       navigator.clipboard.writeText(txt).then(()=>{
         btn.textContent="Copied ✓"; btn.classList.add("done");
-        setTimeout(()=>{btn.textContent="Copy prompt"; btn.classList.remove("done");},1500);
+        setTimeout(()=>{btn.textContent=orig; btn.classList.remove("done");},1500);
       });
     });
   });
