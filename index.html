@@ -231,6 +231,7 @@
     <textarea id="cleanInput" style="min-height:120px" placeholder="Paste the full ChatGPT output here…"></textarea>
     <div class="actions" style="margin:12px 0 0">
       <button class="primary" onclick="runClean()">Clean for Word</button>
+      <button class="ghost" onclick="downloadDoc()">⬇ Download Word (.doc)</button>
       <span class="pill" id="cleanStatus"></span>
     </div>
     <div id="cleanWrap" style="display:none;margin-top:14px">
@@ -1472,6 +1473,23 @@ function runClean(){
   document.getElementById("cleanOutput").innerHTML = renderForWord(cleaned);
   document.getElementById("cleanWrap").style.display = "block";
   s.textContent="Cleaned. Copy it into your Word doc (links and headings preserved)."; s.style.color="var(--accent2)";
+}
+// Build a Word-openable .doc (HTML-based) from the pasted output — bold, links, and paragraphs all preserved, no copy-paste.
+function downloadDoc(){
+  const raw = document.getElementById("cleanInput").value;
+  const s = document.getElementById("cleanStatus");
+  if(!raw.trim()){ s.textContent="Paste the ChatGPT output first."; s.style.color="var(--warn)"; return; }
+  const body = renderForWord(cleanForWord(raw));
+  const html = '<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>City Page</title>' +
+    '<style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#000} p{margin:0 0 10pt} a{color:#1155cc}</style></head><body>' + body + '</body></html>';
+  const slug = (document.getElementById("URL_SLUG") && document.getElementById("URL_SLUG").value.trim()) || "city-page-draft";
+  const blob = new Blob(["﻿"+html], {type:"application/msword"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = slug.replace(/[^a-z0-9-]+/gi,"-").replace(/^-+|-+$/g,"") + ".doc";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  s.textContent="Downloaded a .doc — open it in Word; headings, bold, and links are already formatted."; s.style.color="var(--accent2)";
 }
 document.getElementById("cleanCopy").addEventListener("click", async ()=>{
   const btn=document.getElementById("cleanCopy");
