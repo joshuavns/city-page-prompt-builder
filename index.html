@@ -80,14 +80,11 @@
       </div>
     </div>
     <div><label>Address <span class="hint">(full address, or leave blank / N/A if no physical location)</span></label><input id="ADDRESS" placeholder="N/A"></div>
-    <div class="row3">
-      <div><label>Industry</label><input id="INDUSTRY" placeholder="In-Home Care"></div>
-      <div><label>Vertical (picks the Pack)</label>
-        <select id="VERTICAL">
-          <option value="HOME_IMPROVEMENT">Home Improvement</option>
-          <option value="HOME_CARE" selected>Home Care</option>
-          <option value="DEATH_CARE">Death Care</option>
-        </select>
+    <div class="row2">
+      <div>
+        <label>Industry</label>
+        <select id="INDUSTRY"></select>
+        <div class="hint" id="verticalNote"></div>
       </div>
       <div><label>Writing Voice</label>
         <select id="WRITING_VOICE">
@@ -750,7 +747,7 @@ Before returning, silently self-check and fix any violations: city-name count eq
 
 /* ---------- Fields used to build the brief ---------- */
 const FIELDS = ["BUSINESS_NAME","WEBSITE_URL","PHONE","URL_SLUG","KEYWORD","CITY","STATE",
-  "HAS_PHYSICAL_LOCATION","ADDRESS","INDUSTRY","VERTICAL","WRITING_VOICE",
+  "HAS_PHYSICAL_LOCATION","ADDRESS","INDUSTRY","WRITING_VOICE",
   "BRAND_IDENTITY","GBP_REVIEW","CLIENT_RESTRICTIONS","LOCATION_RESTRICTIONS","KEYWORD_RESEARCH",
   "SERVICES","FAQ_LINKS","H1S_USED",
   "SGE_TOPIC","SGE_CUSTOM","SGE_USED","INFOGRAPHIC_TOPIC","INFOGRAPHIC_CUSTOM","INFOGRAPHIC_USED",
@@ -758,42 +755,125 @@ const FIELDS = ["BUSINESS_NAME","WEBSITE_URL","PHONE","URL_SLUG","KEYWORD","CITY
 
 const VLABEL = {HOME_IMPROVEMENT:"Home Improvement",HOME_CARE:"Home Care",DEATH_CARE:"Death Care"};
 
-/* ---------- Topic libraries (per vertical) for the anti-repeat dropdowns ---------- */
+/* ---------- Industries → label + the Vertical Pack each one uses ---------- */
+const INDUSTRIES = {
+  HVAC:              {label:"HVAC Heating & Cooling",       vertical:"HOME_IMPROVEMENT"},
+  ROOFING:           {label:"Roofing & Siding",             vertical:"HOME_IMPROVEMENT"},
+  WINDOWS_DOORS:     {label:"Windows & Doors",              vertical:"HOME_IMPROVEMENT"},
+  WINDOW_TREATMENTS: {label:"Window Treatments",            vertical:"HOME_IMPROVEMENT"},
+  IN_HOME_CARE:      {label:"In-Home Care",                 vertical:"HOME_CARE"},
+  HOME_HEALTH:       {label:"Home Health Care",             vertical:"HOME_CARE"},
+  HOSPICE:           {label:"Hospice & Palliative Care",    vertical:"DEATH_CARE"},
+  FUNERAL:           {label:"Funeral Homes & Cremation",    vertical:"DEATH_CARE"},
+  CREMATION:         {label:"Cremation Services (Standalone)", vertical:"DEATH_CARE"},
+  CEMETERY:          {label:"Cemetery",                     vertical:"DEATH_CARE"}
+};
+
+/* ---------- Topic libraries (per INDUSTRY) for the anti-repeat dropdowns ---------- */
 const AUTO = "Auto — let AI choose a fresh angle (avoid the Already-Used list)";
 const SGE_TOPICS = {
-  HOME_IMPROVEMENT:[
-    "Choosing a contractor they can actually trust",
-    "Deciding whether to repair or fully replace",
-    "Planning the project around budget and financing",
-    "Navigating permits, codes, and inspections",
-    "Timing the project around weather and seasons",
-    "Lowering energy bills and improving efficiency",
-    "Protecting the home against storm or weather damage",
-    "Avoiding low-quality materials and fly-by-night installers"
+  HVAC:[
+    "Deciding whether to repair or replace an aging system",
+    "Handling an emergency breakdown in extreme weather",
+    "Lowering high energy and utility bills",
+    "Choosing the right system size and efficiency rating",
+    "Finding an HVAC contractor they can trust on pricing",
+    "Keeping indoor air clean and healthy year-round",
+    "Scheduling maintenance to avoid surprise failures"
   ],
-  HOME_CARE:[
+  ROOFING:[
+    "Spotting and addressing storm or hail damage",
+    "Navigating a roof insurance claim",
+    "Deciding whether to repair or fully replace the roof",
+    "Choosing roofing materials suited to the local climate",
+    "Avoiding fly-by-night or storm-chasing contractors",
+    "Protecting the home from leaks and water damage",
+    "Improving curb appeal and resale value with new siding"
+  ],
+  WINDOWS_DOORS:[
+    "Deciding whether to repair or replace old windows",
+    "Lowering energy bills through efficient windows and doors",
+    "Choosing frame materials and glass for the climate",
+    "Improving home security and curb appeal",
+    "Navigating cost, financing, and big-box comparisons",
+    "Reducing drafts, outside noise, and condensation"
+  ],
+  WINDOW_TREATMENTS:[
+    "Choosing the right treatment for light and privacy needs",
+    "Balancing style, budget, and function room by room",
+    "Deciding between blinds, shades, shutters, and drapery",
+    "Considering motorization and smart-home options",
+    "Getting a proper custom fit versus big-box sizing",
+    "Protecting furnishings from sun and UV fading"
+  ],
+  IN_HOME_CARE:[
     "Recognizing when a loved one needs help at home",
     "Deciding between in-home care and a facility",
-    "Arranging care after a hospital stay or health event",
-    "Understanding how to pay for care (insurance, Medicare/Medicaid, private)",
+    "Arranging care after a hospital stay or a fall",
+    "Understanding how to pay for non-medical care",
     "Finding and trusting the right caregiver",
     "Easing caregiver burnout within the family",
-    "Keeping an aging parent safe and independent at home",
-    "Coordinating consistent, reliable scheduling"
+    "Keeping an aging parent safe and independent at home"
   ],
-  DEATH_CARE:[
+  HOME_HEALTH:[
+    "Understanding what Medicare home health covers",
+    "Transitioning safely from hospital to home recovery",
+    "Qualifying for skilled nursing or therapy at home",
+    "Coordinating care between doctors, nurses, and family",
+    "Managing a chronic condition safely at home",
+    "Knowing the difference between home health and home care"
+  ],
+  HOSPICE:[
+    "Knowing when it may be time to consider hospice",
+    "Understanding what hospice care includes and covers",
+    "Supporting a loved one's comfort and dignity at end of life",
+    "Navigating difficult family conversations about care",
+    "Coordinating support for caregivers and family",
+    "Understanding the difference between hospice and palliative care"
+  ],
+  FUNERAL:[
     "Making arrangements during an unexpected loss",
     "Understanding burial versus cremation options",
     "Pre-planning to ease the burden on family",
+    "Personalizing a service to honor a life",
     "Handling costs and what is involved, sensitively",
-    "Honoring a loved one's final wishes",
-    "Knowing the first steps to take after a death",
-    "Choosing a meaningful way to memorialize a life",
-    "Supporting children and family through grief"
+    "Knowing the first steps to take after a death"
+  ],
+  CREMATION:[
+    "Understanding direct versus traditional cremation",
+    "Pre-planning a simple, dignified cremation",
+    "Choosing memorialization options after cremation",
+    "Knowing what is involved and how costs work",
+    "Honoring a loved one's wishes without a large service",
+    "Taking the first steps after a loss"
+  ],
+  CEMETERY:[
+    "Choosing between burial, mausoleum, and cremation niches",
+    "Knowing what to consider before buying a plot",
+    "Pre-planning interment to ease family decisions",
+    "Selecting a meaningful memorial or headstone",
+    "Navigating costs and options sensitively",
+    "Planning a graveside or committal service"
   ]
 };
 const INFOGRAPHIC_TOPICS = {
-  HOME_IMPROVEMENT:[
+  HVAC:[
+    "A Seasonal HVAC Maintenance Checklist",
+    "Signs Your HVAC System Is Ready for Replacement",
+    "How to Improve Indoor Air Quality at Home",
+    "Understanding SEER Ratings and Energy Efficiency",
+    "The Homeowner's Guide to Choosing the Right HVAC System",
+    "Common Causes of High Energy Bills"
+  ],
+  ROOFING:[
+    "5 Signs You Need a New Roof",
+    "Roofing Material Comparison: A Homeowner's Guide",
+    "How to Spot Storm Damage on Your Roof",
+    "What to Expect During a Roof Replacement",
+    "A Homeowner's Guide to Roof Insurance Claims",
+    "Siding Material Options Compared"
+  ],
+  WINDOWS_DOORS:[
     "5 Signs It's Time to Replace Your Windows and Doors",
     "Window Frame Materials: A Homeowner's Comparison Guide",
     "How to Choose the Right Glass Type for Every Room",
@@ -801,29 +881,41 @@ const INFOGRAPHIC_TOPICS = {
     "Home Heat Loss by Area: Where Your Energy Goes",
     "Understanding ENERGY STAR Ratings for Windows and Doors",
     "How Energy-Efficient Windows Reduce Your Utility Bills",
-    "The True Cost of Keeping Old Windows",
-    "5 Signs You Need a New Roof",
-    "Roofing Material Comparison: A Homeowner's Guide",
-    "How to Spot Storm Damage on Your Roof",
-    "What to Expect During a Roof Replacement",
-    "A Seasonal HVAC Maintenance Checklist",
-    "Signs Your HVAC System Is Ready for Replacement",
-    "How to Improve Indoor Air Quality at Home",
-    "Choosing the Right Window Treatments for Each Room"
+    "The True Cost of Keeping Old Windows"
   ],
-  HOME_CARE:[
+  WINDOW_TREATMENTS:[
+    "Choosing the Right Window Treatments for Each Room",
+    "Blinds vs. Shades vs. Shutters: A Comparison Guide",
+    "How Motorized Window Treatments Work",
+    "A Guide to Light Control and Privacy at Home",
+    "Window Treatments That Help Lower Energy Costs",
+    "How to Measure for the Perfect Custom Fit"
+  ],
+  IN_HOME_CARE:[
     "Signs Your Senior Parent May Need Home Care",
     "The Home Safety Checklist for Aging in Place",
     "Activities of Daily Living: A Family Reference Guide",
     "How to Talk to a Parent About Accepting Home Care",
     "Questions to Ask a Home Care Provider",
+    "Signs a Loved One May Need Help at Home"
+  ],
+  HOME_HEALTH:[
     "Medicare Home Health Benefits: What Seniors Are Entitled To",
     "Home Health vs. Home Care: Understanding the Difference",
     "How to Qualify for Medicare Home Health Services",
     "The Recovery-at-Home Checklist for Families",
-    "Signs a Loved One May Need Help at Home"
+    "What to Expect from Skilled Nursing at Home",
+    "Managing a Chronic Condition at Home"
   ],
-  DEATH_CARE:[
+  HOSPICE:[
+    "Understanding What Hospice Care Includes",
+    "Hospice vs. Palliative Care: The Difference",
+    "Signs It May Be Time to Consider Hospice",
+    "How Hospice Supports the Whole Family",
+    "A Family Guide to Comfort-Focused Care",
+    "Questions to Ask When Choosing Hospice"
+  ],
+  FUNERAL:[
     "The Funeral Pre-Planning Checklist",
     "What to Do in the First 24 Hours After a Loss",
     "Burial vs. Cremation: Understanding Your Options",
@@ -833,15 +925,42 @@ const INFOGRAPHIC_TOPICS = {
     "How to Support a Grieving Family: A Practical Guide",
     "A Guide to Military Funeral Honors and Benefits",
     "How to Plan a Celebration of Life Service",
-    "How to Talk to Your Family About End-of-Life Wishes",
-    "Types of Cremation Urns and Memorialization Options",
+    "How to Talk to Your Family About End-of-Life Wishes"
+  ],
+  CREMATION:[
     "Types of Cremation Services Explained",
     "Pre-Planning Your Cremation: A Step-by-Step Guide",
+    "Cremation Memorialization Options Beyond the Urn",
+    "What Families Should Know Before Choosing Cremation",
+    "Direct vs. Traditional Cremation: The Difference",
+    "Types of Cremation Urns and Keepsakes"
+  ],
+  CEMETERY:[
     "Types of Cemetery Burial Options Explained",
     "What to Know Before Purchasing a Cemetery Plot",
-    "Steps in Planning a Meaningful Service"
+    "Choosing Between Burial and Cremation: A Family Guide",
+    "How to Plan a Meaningful Graveside Memorial",
+    "Understanding Headstone and Memorial Options",
+    "Pre-Planning Interment: A Step-by-Step Guide"
   ]
 };
+
+function currentVertical(){ return (INDUSTRIES[val("INDUSTRY")]||{}).vertical || "HOME_CARE"; }
+
+function populateIndustries(){
+  const sel = document.getElementById("INDUSTRY");
+  sel.innerHTML = "";
+  Object.keys(INDUSTRIES).forEach(k=>{
+    const o = document.createElement("option");
+    o.value = k; o.textContent = INDUSTRIES[k].label; sel.appendChild(o);
+  });
+}
+function updateVerticalNote(){
+  const v = currentVertical();
+  document.getElementById("verticalNote").textContent = "Uses the " + VLABEL[v] + " Vertical Pack (tone, CTAs, headings).";
+  const box=document.getElementById("packPreview");
+  if(box && box.style.display==="block") box.textContent = PACKS[v];
+}
 
 function fillSelect(id, items){
   const sel = document.getElementById(id);
@@ -855,9 +974,9 @@ function fillSelect(id, items){
   sel.value = [...sel.options].some(o=>o.value===prev) ? prev : AUTO;
 }
 function populateTopics(){
-  const v = val("VERTICAL");
-  fillSelect("SGE_TOPIC", SGE_TOPICS[v]);
-  fillSelect("INFOGRAPHIC_TOPIC", INFOGRAPHIC_TOPICS[v]);
+  const ind = val("INDUSTRY");
+  fillSelect("SGE_TOPIC", SGE_TOPICS[ind] || []);
+  fillSelect("INFOGRAPHIC_TOPIC", INFOGRAPHIC_TOPICS[ind] || []);
 }
 // resolve a topic field: custom override wins; else the dropdown; "Auto" -> "Auto"
 function resolveTopic(selId, customId){
@@ -882,8 +1001,8 @@ CITY: ${v("CITY")}
 STATE: ${v("STATE")}
 HAS_PHYSICAL_LOCATION: ${val("HAS_PHYSICAL_LOCATION")}
 ADDRESS: ${v("ADDRESS")}
-INDUSTRY: ${v("INDUSTRY")}
-VERTICAL: ${VLABEL[val("VERTICAL")]}
+INDUSTRY: ${(INDUSTRIES[val("INDUSTRY")]||{}).label || "N/A"}
+VERTICAL: ${VLABEL[currentVertical()]}
 WRITING_VOICE: ${val("WRITING_VOICE")}
 
 === BRAND IDENTITY ===
@@ -947,7 +1066,7 @@ function generate(){
     setStatus("Add at least Business Name, City, and Keyword first.", true);
   }
   const brief = buildBrief();
-  const pack = PACKS[val("VERTICAL")];
+  const pack = PACKS[currentVertical()];
   // One-shot mode = Prompt 1 (Meta) + the Full Page master prompt. Section mode = all 14.
   const list = mode()==="oneshot" ? [PROMPTS[0], FULLPAGE] : PROMPTS;
   const out = document.getElementById("output");
@@ -992,13 +1111,12 @@ document.getElementById("togglePack").addEventListener("click",e=>{
   e.preventDefault();
   const box=document.getElementById("packPreview");
   if(box.style.display==="block"){ box.style.display="none"; return; }
-  box.textContent = PACKS[val("VERTICAL")];
+  box.textContent = PACKS[currentVertical()];
   box.style.display="block";
 });
-document.getElementById("VERTICAL").addEventListener("change",()=>{
-  const box=document.getElementById("packPreview");
-  if(box.style.display==="block") box.textContent = PACKS[val("VERTICAL")];
+document.getElementById("INDUSTRY").addEventListener("change",()=>{
   populateTopics();
+  updateVerticalNote();
 });
 
 /* ---------- Save / load brief (localStorage) ---------- */
@@ -1011,16 +1129,17 @@ function loadBrief(){
   const raw=localStorage.getItem("rrm_city_brief");
   if(!raw){ setStatus("No saved brief found.", true); return; }
   const data=JSON.parse(raw);
-  // set VERTICAL first, repopulate the topic dropdowns for that vertical, then apply all values
-  if(data.VERTICAL!==undefined) document.getElementById("VERTICAL").value=data.VERTICAL;
+  // set INDUSTRY first, repopulate the topic dropdowns for that industry, then apply all values
+  if(data.INDUSTRY!==undefined && INDUSTRIES[data.INDUSTRY]) document.getElementById("INDUSTRY").value=data.INDUSTRY;
   populateTopics();
   FIELDS.forEach(id=>{
     if(data[id]===undefined) return;
     const el=document.getElementById(id);
-    // only keep a saved topic-dropdown value if it still exists for this vertical
+    // only keep a saved topic-dropdown value if it still exists for this industry
     if((id==="SGE_TOPIC"||id==="INFOGRAPHIC_TOPIC") && ![...el.options].some(o=>o.value===data[id])) return;
     el.value=data[id];
   });
+  updateVerticalNote();
   setStatus("Brief loaded.", false);
 }
 function clearAll(){
@@ -1029,12 +1148,15 @@ function clearAll(){
     if(el.tagName==="SELECT") el.selectedIndex=0; else el.value="";
   });
   populateTopics();
+  updateVerticalNote();
   document.getElementById("output").innerHTML='<div class="empty">Fill the brief and click <b>Generate</b>.</div>';
   setStatus("Cleared.", false);
 }
 
+populateIndustries();
 updateBtn();
 populateTopics();
+updateVerticalNote();
 </script>
 </body>
 </html>

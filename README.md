@@ -9,7 +9,8 @@ A single-file tool for Ring Ring Marketing's SEO team. Fill out the Client Brief
 ## How to use
 
 1. Fill in the **Client Brief** fields (Business Name, City, and Keyword are the minimum to generate).
-2. Pick the **Vertical** — Home Improvement, Home Care, or Death Care. The matching Vertical Pack is injected automatically.
+2. Pick the **Industry** (HVAC, Roofing, In-Home Care, Funeral, etc.). This drives the SGE/AIO + infographic topic libraries **and** auto-selects the matching Vertical Pack (tone, CTAs, heading patterns) behind the scenes.
+3. Under **Topic Control**, choose the SGE/AIO angle and infographic topic (or leave on Auto), and paste any "already used" topics so they're never repeated across the client's pages.
 3. Click **Generate all 14 prompts**.
 4. **Run Prompt 1 (Meta)** in ChatGPT first → pick a set → paste its H1 / Meta Title / Meta Description into the **Selected Meta Set** fields → click Generate again.
 5. Copy each prompt (Copy button) into a fresh ChatGPT (GPT-5.5) message and run Prompts 2–14 in order.
