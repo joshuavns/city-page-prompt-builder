@@ -55,6 +55,16 @@
   .attach-status{font-size:12px;color:var(--muted)}
   .attach-status.ok{color:var(--accent2)}
   .attach-status.err{color:var(--warn)}
+  .svc{border:1px solid var(--line);border-radius:8px;padding:12px;margin:0 0 10px;background:var(--panel2)}
+  .svc-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center}
+  .svc-del{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:9px 12px;font-size:14px}
+  .svc-del:hover{border-color:var(--warn);color:var(--warn)}
+  .svc-toggle{display:inline-block;margin-top:8px;font-size:12px;color:var(--muted);cursor:pointer}
+  .svc-toggle:hover{color:var(--accent)}
+  .svc-subwrap{margin-top:8px}
+  .svc-subs{min-height:64px}
+  .addsvc{background:transparent;color:var(--accent);border:1px dashed var(--line);width:100%;padding:11px;font-weight:600}
+  .addsvc:hover{border-color:var(--accent);background:var(--panel2)}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -124,10 +134,9 @@
   <div class="grid">
     <fieldset>
       <legend>Services to Cover</legend>
-      <textarea id="SERVICES" style="min-height:130px" placeholder="List in exact order. For each:
-SERVICE: <name>
-URL: <service page URL or N/A>
-SUB-SERVICES: <one per line, or 'scrape URL' or 'none'>"></textarea>
+      <div class="hint" style="margin:0 0 12px">Add each service you want covered, in order. Add a URL to interlink to that page. Use the toggle to enter sub-services manually (most reliable). Empty rows are skipped.</div>
+      <div id="servicesList"></div>
+      <button type="button" class="addsvc" onclick="addService()">+ Add service</button>
     </fieldset>
     <fieldset>
       <legend>Internal Links for FAQ</legend>
@@ -766,7 +775,7 @@ Before returning, silently self-check and fix any violations: city-name count eq
 const FIELDS = ["BUSINESS_NAME","WEBSITE_URL","PHONE","URL_SLUG","KEYWORD","CITY","STATE",
   "HAS_PHYSICAL_LOCATION","ADDRESS","INDUSTRY","WRITING_VOICE",
   "BRAND_IDENTITY","GBP_REVIEW","CLIENT_RESTRICTIONS","LOCATION_RESTRICTIONS","KEYWORD_RESEARCH",
-  "SERVICES","FAQ_LINKS","H1S_USED",
+  "FAQ_LINKS","H1S_USED",
   "SGE_TOPIC","SGE_CUSTOM","SGE_USED","INFOGRAPHIC_TOPIC","INFOGRAPHIC_CUSTOM","INFOGRAPHIC_USED",
   "SELECTED_H1","SELECTED_META_TITLE","SELECTED_META_DESCRIPTION"];
 
@@ -1129,6 +1138,65 @@ function resolveTopic(selId, customId){
 function val(id){ return (document.getElementById(id).value || "").trim(); }
 function orNA(v){ return v ? v : "N/A"; }
 
+/* ---------- Services to Cover: dynamic rows ---------- */
+let svcSeq = 0;
+function addService(data){
+  data = data || {};
+  svcSeq++;
+  const card = document.createElement("div");
+  card.className = "svc";
+  card.innerHTML =
+    '<div class="svc-row">' +
+      '<input class="svc-name" placeholder="Service name (e.g. Companion Care)">' +
+      '<input class="svc-url" placeholder="Service URL (optional)">' +
+      '<button type="button" class="svc-del" title="Remove service" onclick="this.closest(\'.svc\').remove()">🗑</button>' +
+    '</div>' +
+    '<span class="svc-toggle" onclick="toggleSubs(this)">▸ Add sub-services manually (optional)</span>' +
+    '<div class="svc-subwrap" style="display:none">' +
+      '<textarea class="svc-subs" placeholder="One sub-service per line. Leave blank to let the URL or a standard description handle it."></textarea>' +
+    '</div>';
+  document.getElementById("servicesList").appendChild(card);
+  card.querySelector(".svc-name").value = data.name || "";
+  card.querySelector(".svc-url").value = data.url || "";
+  if(data.subs){
+    card.querySelector(".svc-subs").value = data.subs;
+    card.querySelector(".svc-subwrap").style.display = "block";
+    card.querySelector(".svc-toggle").textContent = "▾ Add sub-services manually (optional)";
+  }
+}
+function toggleSubs(el){
+  const card = el.closest(".svc");
+  const wrap = card.querySelector(".svc-subwrap");
+  const open = wrap.style.display === "block";
+  wrap.style.display = open ? "none" : "block";
+  el.textContent = (open ? "▸" : "▾") + " Add sub-services manually (optional)";
+}
+function collectServices(){
+  return [...document.querySelectorAll("#servicesList .svc")].map(c=>({
+    name:(c.querySelector(".svc-name").value||"").trim(),
+    url:(c.querySelector(".svc-url").value||"").trim(),
+    subs:(c.querySelector(".svc-subs").value||"").trim()
+  }));
+}
+// Serialize the rows into the SERVICE / URL / SUB-SERVICES format the prompts expect.
+function servicesBriefText(){
+  const rows = collectServices().filter(s => s.name || s.url || s.subs);
+  if(!rows.length) return "N/A";
+  return rows.map(s=>{
+    const name = s.name || "(unnamed service)";
+    const url = s.url || "N/A";
+    let subs;
+    if(s.subs){
+      subs = "\n" + s.subs.split(/\n+/).map(x=>x.trim()).filter(Boolean).map(l=>"- "+l).join("\n");
+    } else if(s.url){
+      subs = "scrape URL";
+    } else {
+      subs = "none";
+    }
+    return `SERVICE: ${name}\nURL: ${url}\nSUB-SERVICES: ${subs}`;
+  }).join("\n\n");
+}
+
 function buildBrief(){
   const v = id => orNA(val(id));
   return `=== CLIENT BRIEF ===
@@ -1161,7 +1229,7 @@ ${v("LOCATION_RESTRICTIONS")}
 ${v("KEYWORD_RESEARCH")}
 
 === SERVICES TO COVER ===
-${v("SERVICES")}
+${servicesBriefText()}
 
 === INTERNAL LINKS FOR FAQ ===
 ${v("FAQ_LINKS")}
@@ -1302,8 +1370,14 @@ async function attachFile(targetId, input){
 /* ---------- Save / load brief (localStorage) ---------- */
 function saveBrief(){
   const data={}; FIELDS.forEach(id=>data[id]=document.getElementById(id).value);
+  data.__services = collectServices();
   localStorage.setItem("rrm_city_brief", JSON.stringify(data));
   setStatus("Brief saved in this browser.", false);
+}
+function renderServices(rows){
+  const list = document.getElementById("servicesList");
+  list.innerHTML = "";
+  (rows && rows.length ? rows : [{},{},{}]).forEach(addService);
 }
 function loadBrief(){
   const raw=localStorage.getItem("rrm_city_brief");
@@ -1320,6 +1394,7 @@ function loadBrief(){
     el.value=data[id];
   });
   updateVerticalNote();
+  renderServices(data.__services);
   setStatus("Brief loaded.", false);
 }
 function clearAll(){
@@ -1329,6 +1404,7 @@ function clearAll(){
   });
   populateTopics();
   updateVerticalNote();
+  renderServices();
   document.getElementById("output").innerHTML='<div class="empty">Fill the brief and click <b>Generate</b>.</div>';
   setStatus("Cleared.", false);
 }
@@ -1337,6 +1413,7 @@ populateIndustries();
 updateBtn();
 populateTopics();
 updateVerticalNote();
+renderServices();
 </script>
 </body>
 </html>
