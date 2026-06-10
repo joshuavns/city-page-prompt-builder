@@ -48,7 +48,16 @@
   .meta-after{border-color:var(--warn)}
   .meta-after legend{color:var(--warn)}
   .empty{color:var(--muted);text-align:center;padding:40px;border:1px dashed var(--line);border-radius:10px}
+  .attach{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+  .filein{font-size:12px;color:var(--muted);max-width:280px}
+  .filein::file-selector-button{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font:600 12px inherit;cursor:pointer;margin-right:8px}
+  .filein::file-selector-button:hover{border-color:var(--accent)}
+  .attach-status{font-size:12px;color:var(--muted)}
+  .attach-status.ok{color:var(--accent2)}
+  .attach-status.err{color:var(--warn)}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <header>
@@ -101,6 +110,10 @@
     <fieldset>
       <legend>Brand Identity</legend>
       <textarea id="BRAND_IDENTITY" placeholder="Years in business, family-owned, awards, certifications, accreditations, staff size, service-area reach, brand authorizations, process commitments..."></textarea>
+      <div class="attach">
+        <input type="file" id="BRAND_IDENTITY_file" class="filein" accept=".txt,.md,.csv,.docx,.xlsx,.xls" onchange="attachFile('BRAND_IDENTITY', this)">
+        <span class="attach-status" id="BRAND_IDENTITY_status">…or attach .docx / .xlsx / .csv / .txt — text is extracted into the field</span>
+      </div>
     </fieldset>
     <fieldset>
       <legend>GBP Review (verbatim)</legend>
@@ -131,6 +144,10 @@ SUB-SERVICES: <one per line, or 'scrape URL' or 'none'>"></textarea>
       <textarea id="LOCATION_RESTRICTIONS" placeholder="Restrictions specific to this city page only, or N/A"></textarea>
       <label>Keyword research</label>
       <textarea id="KEYWORD_RESEARCH" placeholder="Secondary keywords / variations to weave in, or N/A"></textarea>
+      <div class="attach">
+        <input type="file" id="KEYWORD_RESEARCH_file" class="filein" accept=".txt,.md,.csv,.docx,.xlsx,.xls" onchange="attachFile('KEYWORD_RESEARCH', this)">
+        <span class="attach-status" id="KEYWORD_RESEARCH_status">…or attach a file (.docx, .xlsx, .csv, .txt)</span>
+      </div>
     </fieldset>
     <fieldset>
       <legend>Context</legend>
@@ -1241,6 +1258,46 @@ document.getElementById("INDUSTRY").addEventListener("change",()=>{
   populateTopics();
   updateVerticalNote();
 });
+
+/* ---------- File attach: parse .docx/.xlsx/.csv/.txt in-browser, extract text into a field ---------- */
+function parseFile(file){
+  const name = file.name.toLowerCase();
+  if(/\.(txt|md|csv)$/.test(name)) return file.text();
+  if(name.endsWith(".docx")){
+    if(typeof mammoth==="undefined") return Promise.reject(new Error("docx reader not loaded — check your connection"));
+    return file.arrayBuffer().then(ab => mammoth.extractRawText({arrayBuffer:ab}).then(r => r.value));
+  }
+  if(/\.(xlsx|xls)$/.test(name)){
+    if(typeof XLSX==="undefined") return Promise.reject(new Error("spreadsheet reader not loaded — check your connection"));
+    return file.arrayBuffer().then(ab => {
+      const wb = XLSX.read(ab, {type:"array"});
+      return wb.SheetNames.map(n => {
+        const csv = XLSX.utils.sheet_to_csv(wb.Sheets[n]).trim();
+        return wb.SheetNames.length>1 ? ("# "+n+"\n"+csv) : csv;
+      }).filter(Boolean).join("\n\n");
+    });
+  }
+  if(name.endsWith(".doc")) return Promise.reject(new Error("old .doc not supported — re-save as .docx"));
+  if(name.endsWith(".pdf")) return Promise.reject(new Error("PDF not supported yet — paste the text or save as .docx"));
+  return Promise.reject(new Error("unsupported file type"));
+}
+async function attachFile(targetId, input){
+  const file = input.files[0];
+  const status = document.getElementById(targetId+"_status");
+  const setS = (msg,cls)=>{ status.textContent=msg; status.className="attach-status"+(cls?" "+cls:""); };
+  if(!file) return;
+  setS("Reading "+file.name+"…");
+  try{
+    const text = (await parseFile(file) || "").trim();
+    if(!text){ setS("No text found in "+file.name, "err"); input.value=""; return; }
+    const ta = document.getElementById(targetId);
+    ta.value = (ta.value.trim() ? ta.value.trim()+"\n\n" : "") + "[From "+file.name+"]\n" + text;
+    setS("Added "+text.length.toLocaleString()+" characters from "+file.name, "ok");
+  }catch(e){
+    setS("Couldn't read "+file.name+" ("+(e.message||e)+")", "err");
+  }
+  input.value=""; // let the same file be re-attached if needed
+}
 
 /* ---------- Save / load brief (localStorage) ---------- */
 function saveBrief(){

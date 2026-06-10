@@ -18,7 +18,12 @@ A single-file tool for Ring Ring Marketing's SEO team. Fill out the Client Brief
 
 Use **Save brief to browser** / **Load saved brief** to keep your work between sessions.
 
+## Attaching files (Brand Identity / Keyword Research)
+
+Those two fields accept file attachments (**.docx, .xlsx/.xls, .csv, .txt**). The file is parsed **in your browser** and its text is appended into the field, so it travels with the brief into the prompt. Nothing is uploaded anywhere. (Old `.doc` and `.pdf` aren't supported — re-save as `.docx` or paste the text.)
+
 ## Notes
 
 - Everything is client-side. No data leaves the browser; the Save feature uses `localStorage`.
-- The 3 Vertical Packs and all 14 prompts are embedded verbatim from the Section-by-Section Prompt SOP.
+- The 3 Vertical Packs and all section prompts are embedded verbatim from the Section-by-Section Prompt SOP.
+- File parsing uses two libraries loaded from a CDN (mammoth for .docx, SheetJS for .xlsx), so attachments require the page to be online — which it is whenever it loads from GitHub Pages.
